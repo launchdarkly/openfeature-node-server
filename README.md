@@ -1,4 +1,4 @@
-# LaunchDarkly OpenFeature provider the Server-Side SDK for Node.js
+# LaunchDarkly OpenFeature provider for the Server-Side SDK for Node.js
 
 This provider is designed primarily for use in multi-user systems such as web servers and applications. It follows the server-side LaunchDarkly model for multi-user contexts. It is not intended for use in desktop and embedded systems applications.
 
