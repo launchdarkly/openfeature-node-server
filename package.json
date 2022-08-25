@@ -1,0 +1,37 @@
+{
+  "name": "open-feature-node",
+  "version": "0.0.1",
+  "description": "LaunchDarkly OpenFeature provider for node.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "clean": "tsc --build --clean",
+    "build": "tsc --build",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "npm run lint -- --fix"
+  },
+  "keywords": [
+    "launchdarkly",
+    "analytics",
+    "client"
+  ],
+  "license": "Apache-2.0",
+  "dependencies": {
+    "launchdarkly-node-server-sdk": "^6.4.2"
+  },
+  "peerDependencies": {
+    "@openfeature/nodejs-sdk": "^0.3.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.7.4",
+    "@typescript-eslint/eslint-plugin": "^5.22.0",
+    "@typescript-eslint/parser": "^5.22.0",
+    "eslint": "^8.14.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "@types/jest": "^27.4.1",
+    "jest": "^27.5.1",
+    "ts-jest": "^27.1.4"
+  }
+}
