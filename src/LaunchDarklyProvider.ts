@@ -3,7 +3,6 @@ import {
   Provider, ProviderMetadata, ResolutionDetails,
 } from '@openfeature/nodejs-sdk';
 import { LDClient, LDEvaluationDetail, LDUser } from 'launchdarkly-node-server-sdk';
-import { TypeValidators } from './Validators';
 
 function TranslateContext(evalContext: EvaluationContext): LDUser {
   const converted = { ...evalContext, key: evalContext.targetingKey };
@@ -43,7 +42,7 @@ export default class LaunchDarklyProvider implements Provider {
     context: EvaluationContext,
   ): Promise<ResolutionDetails<boolean>> {
     const res = await this.client.variationDetail(flagKey, TranslateContext(context), defaultValue);
-    if (TypeValidators.Boolean.is(res.value)) {
+    if (typeof res.value === 'boolean') {
       return TranslateResult(res);
     }
     return WrongTypeResult<boolean>(defaultValue);
@@ -55,7 +54,7 @@ export default class LaunchDarklyProvider implements Provider {
     context: EvaluationContext,
   ): Promise<ResolutionDetails<string>> {
     const res = await this.client.variationDetail(flagKey, TranslateContext(context), defaultValue);
-    if (TypeValidators.String.is(res.value)) {
+    if (typeof res.value === 'string') {
       return TranslateResult(res);
     }
     return WrongTypeResult<string>(defaultValue);
@@ -67,7 +66,7 @@ export default class LaunchDarklyProvider implements Provider {
     context: EvaluationContext,
   ): Promise<ResolutionDetails<number>> {
     const res = await this.client.variationDetail(flagKey, TranslateContext(context), defaultValue);
-    if (TypeValidators.Number.is(res.value)) {
+    if (typeof res.value === 'number') {
       return TranslateResult(res);
     }
     return WrongTypeResult<number>(defaultValue);
