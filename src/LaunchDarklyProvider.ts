@@ -2,49 +2,9 @@ import {
   EvaluationContext, FlagValue, Hook,
   Provider, ProviderMetadata, ResolutionDetails,
 } from '@openfeature/nodejs-sdk';
-import { LDClient, LDEvaluationDetail, LDUser } from 'launchdarkly-node-server-sdk';
-
-const LDUserBuiltIns = {
-  secondary: 'string',
-  name: 'string',
-  firstName: 'string',
-  lastName: 'string',
-  email: 'string',
-  avatar: 'string',
-  ip: 'string',
-  country: 'string',
-  anonymous: 'boolean',
-};
-
-/**
- * Convert an OpenFeature evaluation context into an LDUser.
- * @param evalContext The OpenFeature evaluation context to translate.
- * @returns An LDUser based on the evaluation context.
- */
-function TranslateContext(evalContext: EvaluationContext): LDUser {
-  const convertedContext: LDUser = { key: evalContext.targetingKey };
-  Object.entries(evalContext).forEach(([key, value]) => {
-    if (Object.prototype.hasOwnProperty.call(LDUserBuiltIns, key)) {
-      if (typeof value === LDUserBuiltIns[key]) {
-        convertedContext[key] = value;
-      }
-      // If the type does not match, then discard.
-    } else {
-      if (!convertedContext.custom) {
-        convertedContext.custom = {};
-      }
-      if (value instanceof Date) {
-        convertedContext.custom[key] = value.toISOString();
-      } else if (typeof value === 'object') {
-        // Discard.
-      } else {
-        convertedContext.custom[key] = value;
-      }
-    }
-  });
-
-  return convertedContext;
-}
+import { LDClient } from 'launchdarkly-node-server-sdk';
+import translateContext from './translateContext';
+import translateResult from './translateResult';
 
 /**
  * Create a {@link  ResolutionDetails} for an evaluation that produced a type different
@@ -52,27 +12,12 @@ function TranslateContext(evalContext: EvaluationContext): LDUser {
  * @param value The default value to populate the {@link  ResolutionDetails} with.
  * @returns An {@link  ResolutionDetails} with the default value.
  */
-function WrongTypeResult<T>(value: T): ResolutionDetails<T> {
+function wrongTypeResult<T>(value: T): ResolutionDetails<T> {
   return {
     value,
     reason: 'ERROR',
     errorCode: 'WRONG_TYPE',
   };
-}
-
-/**
- * Translate an {@link LDEvaluationDetail} to a {@link ResolutionDetails}.
- * @param result The {@link LDEvaluationDetail} to translate.
- * @returns An equivalent {@link ResolutionDetails}.
- */
-function TranslateResult<T>(result: LDEvaluationDetail): ResolutionDetails<T> {
-  const resolution: ResolutionDetails<T> = {
-    value: result.value,
-    variant: result.variationIndex?.toString(),
-    reason: result.reason.kind,
-    errorCode: result.reason.errorKind,
-  };
-  return resolution;
 }
 
 /**
@@ -108,11 +53,11 @@ export default class LaunchDarklyProvider implements Provider {
     defaultValue: boolean,
     context: EvaluationContext,
   ): Promise<ResolutionDetails<boolean>> {
-    const res = await this.client.variationDetail(flagKey, TranslateContext(context), defaultValue);
+    const res = await this.client.variationDetail(flagKey, translateContext(context), defaultValue);
     if (typeof res.value === 'boolean') {
-      return TranslateResult(res);
+      return translateResult(res);
     }
-    return WrongTypeResult<boolean>(defaultValue);
+    return wrongTypeResult<boolean>(defaultValue);
   }
 
   /**
@@ -133,11 +78,11 @@ export default class LaunchDarklyProvider implements Provider {
     defaultValue: string,
     context: EvaluationContext,
   ): Promise<ResolutionDetails<string>> {
-    const res = await this.client.variationDetail(flagKey, TranslateContext(context), defaultValue);
+    const res = await this.client.variationDetail(flagKey, translateContext(context), defaultValue);
     if (typeof res.value === 'string') {
-      return TranslateResult(res);
+      return translateResult(res);
     }
-    return WrongTypeResult<string>(defaultValue);
+    return wrongTypeResult<string>(defaultValue);
   }
 
   /**
@@ -158,11 +103,11 @@ export default class LaunchDarklyProvider implements Provider {
     defaultValue: number,
     context: EvaluationContext,
   ): Promise<ResolutionDetails<number>> {
-    const res = await this.client.variationDetail(flagKey, TranslateContext(context), defaultValue);
+    const res = await this.client.variationDetail(flagKey, translateContext(context), defaultValue);
     if (typeof res.value === 'number') {
-      return TranslateResult(res);
+      return translateResult(res);
     }
-    return WrongTypeResult<number>(defaultValue);
+    return wrongTypeResult<number>(defaultValue);
   }
 
   /**
@@ -181,8 +126,8 @@ export default class LaunchDarklyProvider implements Provider {
     defaultValue: U,
     context: EvaluationContext,
   ): Promise<ResolutionDetails<U>> {
-    const res = await this.client.variationDetail(flagKey, TranslateContext(context), defaultValue);
-    return TranslateResult(res);
+    const res = await this.client.variationDetail(flagKey, translateContext(context), defaultValue);
+    return translateResult(res);
   }
 
   // eslint-disable-next-line class-methods-use-this
