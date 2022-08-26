@@ -14,7 +14,26 @@ This version of the LaunchDarkly OpenFeature provider is compatible with Node.js
 
 ## Getting started
 
-TODO: Provider reference guide?
+### Installation
+
+```
+npm install @openfeature/nodejs-sdk
+npm install launchdarkly-node-server-sdk
+npm install @launchdarkly/open-feature-node
+```
+
+### Usage
+```
+import { OpenFeature } from '@openfeature/nodejs-sdk';
+import { init } from 'launchdarkly-node-server-sdk';
+import { LaunchDarklyProvider } from 'open-feature-node';
+
+
+const ldClient = init('<your-sdk-key>');
+await ldClient.waitForInitialization();
+OpenFeature.setProvider(new LaunchDarklyProvider(ldClient));
+const value = await client.getBooleanDetails('app-enabled', false, {targetingKey: 'my-key'});
+```
 
 Refer to the [SDK reference guide](https://docs.launchdarkly.com/sdk/server-side/node-js) for instructions on getting started with using the SDK.
 
@@ -23,10 +42,6 @@ Refer to the [SDK reference guide](https://docs.launchdarkly.com/sdk/server-side
 Check out our [documentation](http://docs.launchdarkly.com) for in-depth instructions on configuring and using LaunchDarkly. You can also head straight to the [complete reference guide for this SDK](https://docs.launchdarkly.com/sdk/server-side/node-js).
 
 The authoritative description of all properties and methods is in the [TypeScript documentation](https://launchdarkly.github.io/node-server-sdk/).
-
-## Testing
-
-We run integration tests for all our SDKs using a centralized test harness. This approach gives us the ability to test for consistency across SDKs, as well as test networking behavior in a long-running application. These tests cover each method in the SDK, and verify that event sending, flag evaluation, stream reconnection, and other aspects of the SDK all behave correctly.
 
 ## Contributing
 
