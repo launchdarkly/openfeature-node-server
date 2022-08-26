@@ -9,7 +9,8 @@
     "build": "tsc --build",
     "lint": "eslint . --ext .ts",
     "lint:fix": "npm run lint -- --fix",
-    "test": "jest"
+    "test": "jest",
+    "coverage": "npm run test -- --coverage"
   },
   "keywords": [
     "launchdarkly",

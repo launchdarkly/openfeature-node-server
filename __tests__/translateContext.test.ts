@@ -54,6 +54,38 @@ it('accepts custom attributes', () => {
   });
 });
 
+it('ignores custom attributes that are objects', () => {
+  expect(translateContext({ targetingKey: 'the-key', someAttr: {} })).toEqual({
+    key: 'the-key',
+  });
+});
+
+it('accepts string/boolean/number arrays', () => {
+  expect(translateContext({
+    targetingKey: 'the-key',
+    strings: ['a', 'b', 'c'],
+    numbers: [1, 2, 3],
+    booleans: [true, false],
+  })).toEqual({
+    key: 'the-key',
+    custom: {
+      strings: ['a', 'b', 'c'],
+      numbers: [1, 2, 3],
+      booleans: [true, false],
+    },
+  });
+});
+
+it('discards invalid array types', () => {
+  expect(translateContext({
+    targetingKey: 'the-key',
+    mixedTypes: [true, 'b', 1],
+    dates: [new Date()],
+  })).toEqual({
+    key: 'the-key',
+  });
+});
+
 it('converts date to ISO strings', () => {
   const date = new Date();
   expect(translateContext({ targetingKey: 'the-key', date })).toEqual({

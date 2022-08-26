@@ -13,6 +13,16 @@ const LDUserBuiltIns = {
   anonymous: 'boolean',
 };
 
+function addCustom(context: LDUser, key: string, value: string
+| boolean
+| number
+| Array<string | boolean | number>) {
+  if (!context.custom) {
+    context.custom = {};
+  }
+  context.custom[key] = value;
+}
+
 /**
  * Convert an OpenFeature evaluation context into an LDUser.
  * @param evalContext The OpenFeature evaluation context to translate.
@@ -31,17 +41,20 @@ export default function translateContext(evalContext: EvaluationContext): LDUser
         convertedContext[key] = value;
       }
       // If the type does not match, then discard.
+    } else if (value instanceof Date) {
+      addCustom(convertedContext, key, value.toISOString());
+    } else if (Array.isArray(value)) {
+      if (value.every((val) => typeof val === 'string')) {
+        addCustom(convertedContext, key, value as string[]);
+      } else if (value.every((val) => typeof val === 'boolean')) {
+        addCustom(convertedContext, key, value as boolean[]);
+      } else if (value.every((val) => typeof val === 'number')) {
+        addCustom(convertedContext, key, value as string[]);
+      }
+    } else if (typeof value === 'object') {
+      // Discard.
     } else {
-      if (!convertedContext.custom) {
-        convertedContext.custom = {};
-      }
-      if (value instanceof Date) {
-        convertedContext.custom[key] = value.toISOString();
-      } else if (typeof value === 'object') {
-        // Discard.
-      } else {
-        convertedContext.custom[key] = value;
-      }
+      addCustom(convertedContext, key, value);
     }
   });
 
