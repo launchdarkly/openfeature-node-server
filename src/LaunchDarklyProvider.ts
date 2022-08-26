@@ -4,16 +4,46 @@ import {
 } from '@openfeature/nodejs-sdk';
 import { LDClient, LDEvaluationDetail, LDUser } from 'launchdarkly-node-server-sdk';
 
+const LDUserBuiltIns = {
+  secondary: 'string',
+  name: 'string',
+  firstName: 'string',
+  lastName: 'string',
+  email: 'string',
+  avatar: 'string',
+  ip: 'string',
+  country: 'string',
+  anonymous: 'boolean',
+};
+
 /**
  * Convert an OpenFeature evaluation context into an LDUser.
  * @param evalContext The OpenFeature evaluation context to translate.
  * @returns An LDUser based on the evaluation context.
  */
 function TranslateContext(evalContext: EvaluationContext): LDUser {
-  // TODO: What if key and targetingKey are defined. What if there isn't a key at all?
-  const converted = { ...evalContext, key: evalContext.targetingKey };
+  const convertedContext: LDUser = { key: evalContext.targetingKey };
+  Object.entries(evalContext).forEach(([key, value]) => {
+    if (Object.prototype.hasOwnProperty.call(LDUserBuiltIns, key)) {
+      if (typeof value === LDUserBuiltIns[key]) {
+        convertedContext[key] = value;
+      }
+      // If the type does not match, then discard.
+    } else {
+      if (!convertedContext.custom) {
+        convertedContext.custom = {};
+      }
+      if (value instanceof Date) {
+        convertedContext.custom[key] = value.toISOString();
+      } else if (typeof value === 'object') {
+        // Discard.
+      } else {
+        convertedContext.custom[key] = value;
+      }
+    }
+  });
 
-  return converted;
+  return convertedContext;
 }
 
 /**
