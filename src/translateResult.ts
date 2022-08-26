@@ -13,9 +13,7 @@ export default function translateResult<T>(result: LDEvaluationDetail): Resoluti
     value: result.value,
     variant: result.variationIndex?.toString(),
     reason: result.reason.kind,
+    errorCode: result.reason.errorKind,
   };
-  if (result.reason.errorKind) {
-    resolution.errorCode = result.reason.errorKind;
-  }
   return resolution;
 }

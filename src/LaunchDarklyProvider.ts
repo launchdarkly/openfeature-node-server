@@ -111,7 +111,7 @@ export default class LaunchDarklyProvider implements Provider {
   }
 
   /**
-   * Determines the variation of a feature flag for a context, along with information about
+   * Determines the object variation of a feature flag for a context, along with information about
    * how it was calculated.
    *
    * @param flagKey The unique key of the feature flag.
@@ -127,7 +127,10 @@ export default class LaunchDarklyProvider implements Provider {
     context: EvaluationContext,
   ): Promise<ResolutionDetails<U>> {
     const res = await this.client.variationDetail(flagKey, translateContext(context), defaultValue);
-    return translateResult(res);
+    if (typeof res.value === 'object') {
+      return translateResult(res);
+    }
+    return wrongTypeResult<U>(defaultValue);
   }
 
   // eslint-disable-next-line class-methods-use-this
