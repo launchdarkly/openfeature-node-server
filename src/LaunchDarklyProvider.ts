@@ -16,7 +16,7 @@ function wrongTypeResult<T>(value: T): ResolutionDetails<T> {
   return {
     value,
     reason: 'ERROR',
-    errorCode: 'WRONG_TYPE',
+    errorCode: 'TYPE_MISMATCH',
   };
 }
 

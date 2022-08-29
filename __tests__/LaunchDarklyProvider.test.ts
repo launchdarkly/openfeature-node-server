@@ -65,7 +65,7 @@ describe('given a mock LaunchDarkly client', () => {
       flagKey: testFlagKey,
       value: false,
       reason: 'ERROR',
-      errorCode: 'WRONG_TYPE'
+      errorCode: 'TYPE_MISMATCH'
     });
   });
 
@@ -116,7 +116,7 @@ describe('given a mock LaunchDarkly client', () => {
       flagKey: testFlagKey,
       value: 'default',
       reason: 'ERROR',
-      errorCode: 'WRONG_TYPE'
+      errorCode: 'TYPE_MISMATCH'
     });
   });
 
@@ -167,7 +167,7 @@ describe('given a mock LaunchDarkly client', () => {
       flagKey: testFlagKey,
       value: 0,
       reason: 'ERROR',
-      errorCode: 'WRONG_TYPE'
+      errorCode: 'TYPE_MISMATCH'
     });
   });
 
@@ -218,7 +218,7 @@ describe('given a mock LaunchDarkly client', () => {
       flagKey: testFlagKey,
       value: {},
       reason: 'ERROR',
-      errorCode: 'WRONG_TYPE'
+      errorCode: 'TYPE_MISMATCH'
     });
   });
 
