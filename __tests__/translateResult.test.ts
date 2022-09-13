@@ -2,25 +2,25 @@ import { LDEvaluationDetail, LDEvaluationReason } from 'launchdarkly-node-server
 import translateResult from '../src/translateResult';
 
 const reason: LDEvaluationReason = {
-  kind: ''
+  kind: '',
 };
 
 const detail: LDEvaluationDetail = {
   value: undefined,
-  reason: undefined
+  reason: undefined,
 };
 
 it.each([
   true,
-  "potato",
+  'potato',
   42,
-  { yes: "no" },
+  { yes: 'no' },
 ])('puts the value into the result.', (value) => {
   expect(translateResult<typeof value>({
     value,
     reason: {
-      kind: 'OFF'
-    }
+      kind: 'OFF',
+    },
   }).value).toEqual(value);
 });
 
@@ -29,8 +29,8 @@ it('converts the variationIndex into a string variant', () => {
     value: true,
     variationIndex: 9,
     reason: {
-      kind: 'OFF'
-    }
+      kind: 'OFF',
+    },
   }).variant).toEqual('9');
 });
 
@@ -45,8 +45,8 @@ it.each([
     value: true,
     variationIndex: 9,
     reason: {
-      kind: reason
-    }
+      kind: reason,
+    },
   }).reason).toEqual(reason);
 });
 
@@ -55,8 +55,8 @@ it('does not populate the errorCode when there is not an error', () => {
     value: true,
     variationIndex: 9,
     reason: {
-      kind: 'OFF'
-    }
+      kind: 'OFF',
+    },
   });
   expect(translated.errorCode).toBeUndefined();
 });
@@ -67,9 +67,8 @@ it('does populate the errorCode when there is an error', () => {
     variationIndex: 9,
     reason: {
       kind: 'ERROR',
-      errorKind: 'BAD_APPLE'
-    }
+      errorKind: 'BAD_APPLE',
+    },
   });
-  expect(translated.errorCode).toEqual('BAD_APPLE');
+  expect(translated.errorCode).toEqual('GENERAL');
 });
-

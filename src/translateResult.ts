@@ -2,6 +2,28 @@ import { ResolutionDetails } from '@openfeature/nodejs-sdk';
 import { LDEvaluationDetail } from 'launchdarkly-node-server-sdk';
 
 /**
+ * Convert an `errorKind` into an OpenFeature `errorCode`.
+ * @param {string} errorKind The error kind to translate.
+ * @returns {string} The OpenFeature error code.
+ */
+function translateErrorKind(errorKind) {
+  // Error code specification.
+  // https://github.com/open-feature/spec/blob/main/specification/sections/02-providers.md#requirement-28
+  switch (errorKind) {
+    case 'CLIENT_NOT_READY':
+      return 'PROVIDER_NOT_READY';
+    case 'MALFORMED_FLAG':
+      return 'PARSE_ERROR';
+    case 'FLAG_NOT_FOUND':
+      return 'FLAG_NOT_FOUND';
+    // General errors.
+    case 'USER_NOT_SPECIFIED':
+    default:
+      return 'GENERAL';
+  }
+}
+
+/**
  * Translate an {@link LDEvaluationDetail} to a {@link ResolutionDetails}.
  * @param result The {@link LDEvaluationDetail} to translate.
  * @returns An equivalent {@link ResolutionDetails}.
@@ -13,7 +35,10 @@ export default function translateResult<T>(result: LDEvaluationDetail): Resoluti
     value: result.value,
     variant: result.variationIndex?.toString(),
     reason: result.reason.kind,
-    errorCode: result.reason.errorKind,
   };
+
+  if (result.reason.kind === 'ERROR') {
+    resolution.errorCode = translateErrorKind(result.reason.errorKind);
+  }
   return resolution;
 }
