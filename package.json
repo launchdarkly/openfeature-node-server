@@ -19,7 +19,7 @@
   ],
   "license": "Apache-2.0",
   "peerDependencies": {
-    "@openfeature/nodejs-sdk": "^0.3.0",
+    "@openfeature/nodejs-sdk": "^0.3.2",
     "launchdarkly-node-server-sdk": "6.x"
   },
   "devDependencies": {
