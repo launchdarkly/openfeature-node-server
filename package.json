@@ -1,5 +1,5 @@
 {
-  "name": "@launchdarkly/open-feature-node",
+  "name": "@launchdarkly/open-feature-node-server",
   "version": "0.0.1",
   "description": "LaunchDarkly OpenFeature provider for node.",
   "main": "./dist/index.js",
