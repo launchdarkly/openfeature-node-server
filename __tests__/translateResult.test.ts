@@ -1,14 +1,4 @@
-import { LDEvaluationDetail, LDEvaluationReason } from 'launchdarkly-node-server-sdk';
 import translateResult from '../src/translateResult';
-
-const reason: LDEvaluationReason = {
-  kind: '',
-};
-
-const detail: LDEvaluationDetail = {
-  value: undefined,
-  reason: undefined,
-};
 
 it.each([
   true,
