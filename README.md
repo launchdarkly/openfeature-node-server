@@ -34,7 +34,8 @@ import { LaunchDarklyProvider } from 'open-feature-node';
 const ldClient = init('<your-sdk-key>');
 await ldClient.waitForInitialization();
 OpenFeature.setProvider(new LaunchDarklyProvider(ldClient));
-const value = await client.getBooleanDetails('app-enabled', false, {targetingKey: 'my-key'});
+const client = OpenFeature.getClient();
+const value = await client.getBooleanValue('app-enabled', false, {targetingKey: 'my-key'});
 ```
 
 Refer to the [SDK reference guide](https://docs.launchdarkly.com/sdk/server-side/node-js) for instructions on getting started with using the SDK.
