@@ -17,7 +17,7 @@ function translateErrorKind(errorKind) {
     case 'FLAG_NOT_FOUND':
       return 'FLAG_NOT_FOUND';
     // General errors.
-    case 'USER_NOT_SPECIFIED':
+    // 'USER_NOT_SPECIFIED' also falls through to default.
     default:
       return 'GENERAL';
   }
