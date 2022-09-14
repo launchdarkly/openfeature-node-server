@@ -42,7 +42,7 @@ Refer to the [SDK reference guide](https://docs.launchdarkly.com/sdk/server-side
 
 ## OpenFeature Specific Considerations
 
-When evaluating an `LDUser` with the node client a string `key` attribute would normally be required. When using OpenFeature the `targetingKey` attribute should be used instead of `key`. If a `key` attribute is provided in the `EvaluationContext`, then it will be discarded in favor of `targetingKey`. If a `targetingKey` is not provided, or if the `EvaluationContext` is omitted entirely, then the `defaultValue` will be returned from OpenFeature evaluation methods.
+When evaluating an `LDUser` with the LaunchDarkly Node SDK a string `key` attribute would normally be required. When using OpenFeature the `targetingKey` attribute should be used instead of `key`. If a `key` attribute is provided in the `EvaluationContext`, then it will be discarded in favor of `targetingKey`. If a `targetingKey` is not provided, or if the `EvaluationContext` is omitted entirely, then the `defaultValue` will be returned from OpenFeature evaluation methods.
 
 Other fields normally included in an `LDUser` may be added to the `EvaluationContext`. Any `custom` attributes can
 be added to the top level of the evaluation context, and they will operate as if they were `custom` attributes on an `LDUser`. Attributes which are typically top level on an `LDUser` should be of the same types that are specified for
