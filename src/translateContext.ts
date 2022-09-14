@@ -36,7 +36,7 @@ export default function translateContext(evalContext: EvaluationContext): LDUser
     if (key === 'targetingKey') {
       return;
     }
-    if (Object.prototype.hasOwnProperty.call(LDUserBuiltIns, key)) {
+    if (key in LDUserBuiltIns) {
       if (typeof value === LDUserBuiltIns[key]) {
         convertedContext[key] = value;
       }

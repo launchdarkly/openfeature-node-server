@@ -57,7 +57,7 @@ export default class LaunchDarklyProvider implements Provider {
     if (typeof res.value === 'boolean') {
       return translateResult(res);
     }
-    return wrongTypeResult<boolean>(defaultValue);
+    return wrongTypeResult(defaultValue);
   }
 
   /**
@@ -82,7 +82,7 @@ export default class LaunchDarklyProvider implements Provider {
     if (typeof res.value === 'string') {
       return translateResult(res);
     }
-    return wrongTypeResult<string>(defaultValue);
+    return wrongTypeResult(defaultValue);
   }
 
   /**
@@ -107,7 +107,7 @@ export default class LaunchDarklyProvider implements Provider {
     if (typeof res.value === 'number') {
       return translateResult(res);
     }
-    return wrongTypeResult<number>(defaultValue);
+    return wrongTypeResult(defaultValue);
   }
 
   /**
