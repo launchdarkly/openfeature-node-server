@@ -12,7 +12,7 @@ This provider is designed primarily for use in multi-user systems such as web se
 
 ## Supported Node versions
 
-This version of the LaunchDarkly OpenFeature provider is compatible with Node.js versions 16 and above.
+This version of the LaunchDarkly OpenFeature provider is compatible with Node.js versions 14 and above.
 
 ## Getting started
 

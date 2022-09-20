@@ -1,5 +1,6 @@
 import {
   EvaluationContext, FlagValue, Hook,
+  JsonValue,
   Provider, ProviderMetadata, ResolutionDetails,
 } from '@openfeature/nodejs-sdk';
 import { LDClient } from 'launchdarkly-node-server-sdk';
@@ -121,7 +122,7 @@ export default class LaunchDarklyProvider implements Provider {
    *   register this context with LaunchDarkly if the context does not already exist.
    * @returns A promise which will resolve to an {@link EvaluationDetails}.
    */
-  async resolveObjectEvaluation<U extends object>(
+  async resolveObjectEvaluation<U extends JsonValue>(
     flagKey: string,
     defaultValue: U,
     context: EvaluationContext,
