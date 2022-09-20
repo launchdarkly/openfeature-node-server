@@ -1,4 +1,4 @@
-import { ResolutionDetails } from '@openfeature/nodejs-sdk';
+import { ResolutionDetails } from '@openfeature/js-sdk';
 import { LDEvaluationDetail } from 'launchdarkly-node-server-sdk';
 
 /**

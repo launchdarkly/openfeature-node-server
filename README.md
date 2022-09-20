@@ -1,6 +1,6 @@
 # LaunchDarkly OpenFeature provider for the Server-Side SDK for Node.js
 
-This provider allows for using LaunchDarkly with the OpenFeature Node SDK.
+This provider allows for using LaunchDarkly with the OpenFeature JS SDK.
 
 This provider is designed primarily for use in multi-user systems such as web servers and applications. It follows the server-side LaunchDarkly model for multi-user contexts. It is not intended for use in desktop and embedded systems applications.
 
@@ -12,21 +12,21 @@ This provider is designed primarily for use in multi-user systems such as web se
 
 ## Supported Node versions
 
-This version of the LaunchDarkly OpenFeature provider is compatible with Node.js versions 16 and above.
+This version of the LaunchDarkly OpenFeature provider is compatible with Node.js versions 14 and above.
 
 ## Getting started
 
 ### Installation
 
 ```
-npm install @openfeature/nodejs-sdk
+npm install @openfeature/js-sdk
 npm install launchdarkly-node-server-sdk
 npm install @launchdarkly/open-feature-node
 ```
 
 ### Usage
 ```
-import { OpenFeature } from '@openfeature/nodejs-sdk';
+import { OpenFeature } from '@openfeature/js-sdk';
 import { init } from 'launchdarkly-node-server-sdk';
 import { LaunchDarklyProvider } from 'open-feature-node';
 
