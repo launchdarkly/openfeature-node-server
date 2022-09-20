@@ -19,11 +19,11 @@
   ],
   "license": "Apache-2.0",
   "peerDependencies": {
-    "@openfeature/js-sdk": "../../open-feature/node-sdk",
+    "@openfeature/js-sdk": "0.4.0",
     "launchdarkly-node-server-sdk": "6.x"
   },
   "devDependencies": {
-    "@openfeature/js-sdk": "../../open-feature/node-sdk",
+    "@openfeature/js-sdk": "0.4.0",
     "@types/jest": "^27.4.1",
     "@typescript-eslint/eslint-plugin": "^5.22.0",
     "@typescript-eslint/parser": "^5.22.0",
