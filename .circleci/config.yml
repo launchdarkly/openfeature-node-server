@@ -16,9 +16,6 @@ workflows:
           docker-image: cimg/node:current
           run-lint: true
       - build-test-linux:
-          name: Node 17.9
-          docker-image: cimg/node:17.9
-      - build-test-linux:
           name: Node 16.14
           docker-image: cimg/node:16.14
       - build-test-linux:
