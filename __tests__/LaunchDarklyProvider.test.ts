@@ -1,4 +1,4 @@
-import { OpenFeature, Client } from '@openfeature/nodejs-sdk';
+import { OpenFeature, Client } from '@openfeature/js-sdk';
 import { LDClient } from 'launchdarkly-node-server-sdk';
 import { LaunchDarklyProvider } from '../src';
 import translateContext from '../src/translateContext';

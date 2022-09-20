@@ -2,7 +2,7 @@ import {
   EvaluationContext, FlagValue, Hook,
   JsonValue,
   Provider, ProviderMetadata, ResolutionDetails,
-} from '@openfeature/nodejs-sdk';
+} from '@openfeature/js-sdk';
 import { LDClient } from 'launchdarkly-node-server-sdk';
 import translateContext from './translateContext';
 import translateResult from './translateResult';
