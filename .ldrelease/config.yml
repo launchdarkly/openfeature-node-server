@@ -1,8 +1,5 @@
 version: 2
 
-repo:
-  public: openfeature-node-server
-
 branches:
   - name: main
 
