@@ -1,5 +1,5 @@
 import { EvaluationContext } from '@openfeature/js-sdk';
-import { LDUser } from 'launchdarkly-node-server-sdk';
+import { LDLogger, LDUser } from 'launchdarkly-node-server-sdk';
 
 const LDUserBuiltIns = {
   secondary: 'string',
@@ -30,8 +30,22 @@ function addCustom(context: LDUser, key: string, value: string
  *
  * @internal
  */
-export default function translateContext(evalContext: EvaluationContext): LDUser {
-  const convertedContext: LDUser = { key: evalContext.targetingKey };
+export default function translateContext(logger: LDLogger, evalContext: EvaluationContext): LDUser {
+  const keyAttr = evalContext.key as string;
+  const { targetingKey } = evalContext;
+  const finalKey = targetingKey ?? keyAttr;
+
+  if (keyAttr != null && targetingKey != null) {
+    logger.warn("The EvaluationContext contained both a 'targetingKey' and a 'key' attribute. The"
+      + " 'key' attribute will be discarded.");
+  }
+
+  if (finalKey == null) {
+    logger.error("The EvaluationContext must contain either a 'targetingKey' or a 'key' and the "
+      + 'type must be a string.');
+  }
+
+  const convertedContext: LDUser = { key: finalKey };
   Object.entries(evalContext).forEach(([key, value]) => {
     if (key === 'targetingKey') {
       return;
@@ -39,8 +53,10 @@ export default function translateContext(evalContext: EvaluationContext): LDUser
     if (key in LDUserBuiltIns) {
       if (typeof value === LDUserBuiltIns[key]) {
         convertedContext[key] = value;
+      } else {
+        // If the type does not match, then discard.
+        logger.error(`The attribute '${key}' must be of type ${LDUserBuiltIns[key]}`);
       }
-      // If the type does not match, then discard.
     } else if (value instanceof Date) {
       addCustom(convertedContext, key, value.toISOString());
     } else if (Array.isArray(value)) {
@@ -50,8 +66,11 @@ export default function translateContext(evalContext: EvaluationContext): LDUser
         addCustom(convertedContext, key, value as boolean[]);
       } else if (value.every((val) => typeof val === 'number')) {
         addCustom(convertedContext, key, value as string[]);
+      } else {
+        logger.warn(`The attribute '${key}' is an unsupported array type.`);
       }
     } else if (typeof value === 'object') {
+      logger.warn(`The attribute '${key}' is of an unsupported type 'object'`);
       // Discard.
     } else {
       addCustom(convertedContext, key, value);

@@ -1,7 +1,10 @@
 import translateContext from '../src/translateContext';
+import TestLogger from './TestLogger';
 
 it('Uses the targetingKey as the user key', () => {
-  expect(translateContext({ targetingKey: 'the-key' })).toEqual({ key: 'the-key' });
+  const logger = new TestLogger();
+  expect(translateContext(logger, { targetingKey: 'the-key' })).toEqual({ key: 'the-key' });
+  expect(logger.logs.length).toEqual(0);
 });
 
 describe.each([
@@ -15,13 +18,16 @@ describe.each([
   ['country', 'value8'],
   ['anonymous', true],
 ])('given correct built-in attributes', (key, value) => {
+  const logger = new TestLogger();
   it('translates the key correctly', () => {
     expect(translateContext(
+      logger,
       { targetingKey: 'the-key', [key]: value },
     )).toEqual({
       key: 'the-key',
       [key]: value,
     });
+    expect(logger.logs.length).toEqual(0);
   });
 });
 
@@ -37,31 +43,39 @@ describe.each([
   ['anonymous', 'value'],
 ])('given incorrect built-in attributes', (key, value) => {
   it('the bad key is omitted', () => {
+    const logger = new TestLogger();
     expect(translateContext(
+      logger,
       { targetingKey: 'the-key', [key]: value },
     )).toEqual({
       key: 'the-key',
     });
+    expect(logger.logs[0]).toMatch(new RegExp(`The attribute '${key}' must be of type.*`));
   });
 });
 
 it('accepts custom attributes', () => {
-  expect(translateContext({ targetingKey: 'the-key', someAttr: 'someValue' })).toEqual({
+  const logger = new TestLogger();
+  expect(translateContext(logger, { targetingKey: 'the-key', someAttr: 'someValue' })).toEqual({
     key: 'the-key',
     custom: {
       someAttr: 'someValue',
     },
   });
+  expect(logger.logs.length).toEqual(0);
 });
 
 it('ignores custom attributes that are objects', () => {
-  expect(translateContext({ targetingKey: 'the-key', someAttr: {} })).toEqual({
+  const logger = new TestLogger();
+  expect(translateContext(logger, { targetingKey: 'the-key', someAttr: {} })).toEqual({
     key: 'the-key',
   });
+  expect(logger.logs[0]).toEqual("The attribute 'someAttr' is of an unsupported type 'object'");
 });
 
 it('accepts string/boolean/number arrays', () => {
-  expect(translateContext({
+  const logger = new TestLogger();
+  expect(translateContext(logger, {
     targetingKey: 'the-key',
     strings: ['a', 'b', 'c'],
     numbers: [1, 2, 3],
@@ -74,24 +88,36 @@ it('accepts string/boolean/number arrays', () => {
       booleans: [true, false],
     },
   });
+  expect(logger.logs.length).toEqual(0);
 });
 
 it('discards invalid array types', () => {
-  expect(translateContext({
-    targetingKey: 'the-key',
-    mixedTypes: [true, 'b', 1],
-    dates: [new Date()],
-  })).toEqual({
+  const logger = new TestLogger();
+  expect(translateContext(
+    logger,
+    {
+      targetingKey: 'the-key',
+      mixedTypes: [true, 'b', 1],
+      dates: [new Date()],
+    },
+  )).toEqual({
     key: 'the-key',
   });
+  expect(logger.logs[0]).toEqual("The attribute 'mixedTypes' is an unsupported array type.");
+  expect(logger.logs[1]).toEqual("The attribute 'dates' is an unsupported array type.");
 });
 
 it('converts date to ISO strings', () => {
   const date = new Date();
-  expect(translateContext({ targetingKey: 'the-key', date })).toEqual({
+  const logger = new TestLogger();
+  expect(translateContext(
+    logger,
+    { targetingKey: 'the-key', date },
+  )).toEqual({
     key: 'the-key',
     custom: {
       date: date.toISOString(),
     },
   });
+  expect(logger.logs.length).toEqual(0);
 });

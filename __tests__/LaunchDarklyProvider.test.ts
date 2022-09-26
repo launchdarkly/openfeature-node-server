@@ -2,6 +2,7 @@ import { OpenFeature, Client } from '@openfeature/js-sdk';
 import { LDClient } from 'launchdarkly-node-server-sdk';
 import { LaunchDarklyProvider } from '../src';
 import translateContext from '../src/translateContext';
+import TestLogger from './TestLogger';
 
 const basicContext = { targetingKey: 'the-key' };
 const testFlagKey = 'a-key';
@@ -9,13 +10,15 @@ const testFlagKey = 'a-key';
 describe('given a mock LaunchDarkly client', () => {
   let ldClient: LDClient;
   let ofClient: Client;
+  const logger: TestLogger = new TestLogger();
 
   beforeEach(() => {
     ldClient = {
       variationDetail: jest.fn(),
     } as any;
-    OpenFeature.setProvider(new LaunchDarklyProvider(ldClient));
+    OpenFeature.setProvider(new LaunchDarklyProvider(ldClient, { logger }));
     ofClient = OpenFeature.getClient();
+    logger.reset();
   });
 
   it('calls the client correctly for boolean variations', async () => {
@@ -27,11 +30,11 @@ describe('given a mock LaunchDarkly client', () => {
     }));
     await ofClient.getBooleanDetails(testFlagKey, false, basicContext);
     expect(ldClient.variationDetail)
-      .toHaveBeenCalledWith(testFlagKey, translateContext(basicContext), false);
+      .toHaveBeenCalledWith(testFlagKey, translateContext(logger, basicContext), false);
     jest.clearAllMocks();
     await ofClient.getBooleanValue(testFlagKey, false, basicContext);
     expect(ldClient.variationDetail)
-      .toHaveBeenCalledWith(testFlagKey, translateContext(basicContext), false);
+      .toHaveBeenCalledWith(testFlagKey, translateContext(logger, basicContext), false);
   });
 
   it('handles correct return types for boolean variations', async () => {
@@ -74,11 +77,11 @@ describe('given a mock LaunchDarkly client', () => {
     }));
     await ofClient.getStringDetails(testFlagKey, 'default', basicContext);
     expect(ldClient.variationDetail)
-      .toHaveBeenCalledWith(testFlagKey, translateContext(basicContext), 'default');
+      .toHaveBeenCalledWith(testFlagKey, translateContext(logger, basicContext), 'default');
     jest.clearAllMocks();
     await ofClient.getStringValue(testFlagKey, 'default', basicContext);
     expect(ldClient.variationDetail)
-      .toHaveBeenCalledWith(testFlagKey, translateContext(basicContext), 'default');
+      .toHaveBeenCalledWith(testFlagKey, translateContext(logger, basicContext), 'default');
   });
 
   it('handles correct return types for string variations', async () => {
@@ -121,11 +124,11 @@ describe('given a mock LaunchDarkly client', () => {
     }));
     await ofClient.getNumberDetails(testFlagKey, 0, basicContext);
     expect(ldClient.variationDetail)
-      .toHaveBeenCalledWith(testFlagKey, translateContext(basicContext), 0);
+      .toHaveBeenCalledWith(testFlagKey, translateContext(logger, basicContext), 0);
     jest.clearAllMocks();
     await ofClient.getNumberValue(testFlagKey, 0, basicContext);
     expect(ldClient.variationDetail)
-      .toHaveBeenCalledWith(testFlagKey, translateContext(basicContext), 0);
+      .toHaveBeenCalledWith(testFlagKey, translateContext(logger, basicContext), 0);
   });
 
   it('handles correct return types for numeric variations', async () => {
@@ -168,11 +171,11 @@ describe('given a mock LaunchDarkly client', () => {
     }));
     await ofClient.getObjectDetails(testFlagKey, {}, basicContext);
     expect(ldClient.variationDetail)
-      .toHaveBeenCalledWith(testFlagKey, translateContext(basicContext), {});
+      .toHaveBeenCalledWith(testFlagKey, translateContext(logger, basicContext), {});
     jest.clearAllMocks();
     await ofClient.getObjectValue(testFlagKey, {}, basicContext);
     expect(ldClient.variationDetail)
-      .toHaveBeenCalledWith(testFlagKey, translateContext(basicContext), {});
+      .toHaveBeenCalledWith(testFlagKey, translateContext(logger, basicContext), {});
   });
 
   it('handles correct return types for object variations', async () => {
@@ -245,5 +248,17 @@ describe('given a mock LaunchDarkly client', () => {
       variant: '22',
       reason: 'OFF',
     });
+  });
+
+  it('logs information about missing keys', async () => {
+    await ofClient.getObjectDetails(testFlagKey, {}, {});
+    expect(logger.logs[0]).toEqual("The EvaluationContext must contain either a 'targetingKey' "
+    + "or a 'key' and the type must be a string.");
+  });
+
+  it('logs information about double keys', async () => {
+    await ofClient.getObjectDetails(testFlagKey, {}, { targetingKey: '1', key: '2' });
+    expect(logger.logs[0]).toEqual("The EvaluationContext contained both a 'targetingKey' and a"
+    + " 'key' attribute. The 'key' attribute will be discarded.");
   });
 });

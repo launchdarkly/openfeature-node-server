@@ -3,7 +3,10 @@ import {
   JsonValue,
   Provider, ProviderMetadata, ResolutionDetails,
 } from '@openfeature/js-sdk';
-import { LDClient } from 'launchdarkly-node-server-sdk';
+import {
+  basicLogger, LDClient, LDLogger,
+} from 'launchdarkly-node-server-sdk';
+import { LaunchDarklyProviderOptions } from './LaunchDarklyProviderOptions';
 import translateContext from './translateContext';
 import translateResult from './translateResult';
 
@@ -25,6 +28,8 @@ function wrongTypeResult<T>(value: T): ResolutionDetails<T> {
  * An OpenFeature provider for the LaunchDarkly SDK for node.
  */
 export default class LaunchDarklyProvider implements Provider {
+  private readonly logger: LDLogger;
+
   readonly metadata: ProviderMetadata = {
     name: 'launchdarkly-node-provider',
   };
@@ -33,7 +38,12 @@ export default class LaunchDarklyProvider implements Provider {
    * Construct a {@link LaunchDarklyProvider}.
    * @param client The LaunchDarkly client instance to use.
    */
-  constructor(private readonly client: LDClient) {
+  constructor(private readonly client: LDClient, options: LaunchDarklyProviderOptions = {}) {
+    if (options.logger) {
+      this.logger = options.logger;
+    } else {
+      this.logger = basicLogger({ level: 'info' });
+    }
   }
 
   /**
@@ -54,7 +64,11 @@ export default class LaunchDarklyProvider implements Provider {
     defaultValue: boolean,
     context: EvaluationContext,
   ): Promise<ResolutionDetails<boolean>> {
-    const res = await this.client.variationDetail(flagKey, translateContext(context), defaultValue);
+    const res = await this.client.variationDetail(
+      flagKey,
+      this.translateContext(context),
+      defaultValue,
+    );
     if (typeof res.value === 'boolean') {
       return translateResult(res);
     }
@@ -79,7 +93,11 @@ export default class LaunchDarklyProvider implements Provider {
     defaultValue: string,
     context: EvaluationContext,
   ): Promise<ResolutionDetails<string>> {
-    const res = await this.client.variationDetail(flagKey, translateContext(context), defaultValue);
+    const res = await this.client.variationDetail(
+      flagKey,
+      this.translateContext(context),
+      defaultValue,
+    );
     if (typeof res.value === 'string') {
       return translateResult(res);
     }
@@ -104,7 +122,11 @@ export default class LaunchDarklyProvider implements Provider {
     defaultValue: number,
     context: EvaluationContext,
   ): Promise<ResolutionDetails<number>> {
-    const res = await this.client.variationDetail(flagKey, translateContext(context), defaultValue);
+    const res = await this.client.variationDetail(
+      flagKey,
+      this.translateContext(context),
+      defaultValue,
+    );
     if (typeof res.value === 'number') {
       return translateResult(res);
     }
@@ -127,7 +149,11 @@ export default class LaunchDarklyProvider implements Provider {
     defaultValue: U,
     context: EvaluationContext,
   ): Promise<ResolutionDetails<U>> {
-    const res = await this.client.variationDetail(flagKey, translateContext(context), defaultValue);
+    const res = await this.client.variationDetail(
+      flagKey,
+      this.translateContext(context),
+      defaultValue,
+    );
     if (typeof res.value === 'object') {
       return translateResult(res);
     }
@@ -137,5 +163,9 @@ export default class LaunchDarklyProvider implements Provider {
   // eslint-disable-next-line class-methods-use-this
   get hooks(): Hook<FlagValue>[] {
     return [];
+  }
+
+  private translateContext(context: EvaluationContext) {
+    return translateContext(this.logger, context);
   }
 }
