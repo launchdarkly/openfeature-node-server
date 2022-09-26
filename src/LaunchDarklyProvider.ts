@@ -8,10 +8,10 @@ import translateContext from './translateContext';
 import translateResult from './translateResult';
 
 /**
- * Create a {@link  ResolutionDetails} for an evaluation that produced a type different
+ * Create a ResolutionDetails for an evaluation that produced a type different
  * than the expected type.
- * @param value The default value to populate the {@link  ResolutionDetails} with.
- * @returns An {@link  ResolutionDetails} with the default value.
+ * @param value The default value to populate the ResolutionDetails with.
+ * @returns A ResolutionDetails with the default value.
  */
 function wrongTypeResult<T>(value: T): ResolutionDetails<T> {
   return {
@@ -30,7 +30,7 @@ export default class LaunchDarklyProvider implements Provider {
   };
 
   /**
-   * Construct an {@link LaunchDarklyProvider}.
+   * Construct a {@link LaunchDarklyProvider}.
    * @param client The LaunchDarkly client instance to use.
    */
   constructor(private readonly client: LDClient) {
@@ -47,7 +47,7 @@ export default class LaunchDarklyProvider implements Provider {
    *   from LaunchDarkly.
    * @param context The context requesting the flag. The client will generate an analytics event to
    *   register this context with LaunchDarkly if the context does not already exist.
-   * @returns A promise which will resolve to an {@link EvaluationDetails}.
+   * @returns A promise which will resolve to a ResolutionDetails.
    */
   async resolveBooleanEvaluation(
     flagKey: string,
@@ -72,7 +72,7 @@ export default class LaunchDarklyProvider implements Provider {
    *   from LaunchDarkly.
    * @param context The context requesting the flag. The client will generate an analytics event to
    *   register this context with LaunchDarkly if the context does not already exist.
-   * @returns A promise which will resolve to an {@link EvaluationDetails}.
+   * @returns A promise which will resolve to a ResolutionDetails.
    */
   async resolveStringEvaluation(
     flagKey: string,
@@ -97,7 +97,7 @@ export default class LaunchDarklyProvider implements Provider {
    *   from LaunchDarkly.
    * @param context The context requesting the flag. The client will generate an analytics event to
    *   register this context with LaunchDarkly if the context does not already exist.
-   * @returns A promise which will resolve to an {@link EvaluationDetails}.
+   * @returns A promise which will resolve to a ResolutionDetails.
    */
   async resolveNumberEvaluation(
     flagKey: string,
@@ -120,7 +120,7 @@ export default class LaunchDarklyProvider implements Provider {
    *   from LaunchDarkly.
    * @param context The context requesting the flag. The client will generate an analytics event to
    *   register this context with LaunchDarkly if the context does not already exist.
-   * @returns A promise which will resolve to an {@link EvaluationDetails}.
+   * @returns A promise which will resolve to a ResolutionDetails.
    */
   async resolveObjectEvaluation<U extends JsonValue>(
     flagKey: string,
