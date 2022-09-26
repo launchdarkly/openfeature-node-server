@@ -23,6 +23,12 @@ function addCustom(context: LDUser, key: string, value: string
   context.custom[key] = value;
 }
 
+function isOneOfArrayTypes(val: any): boolean {
+  const typeString = typeof val;
+
+  return typeString === 'string' || typeString === 'boolean' || typeString === 'number';
+}
+
 /**
  * Convert an OpenFeature evaluation context into an LDUser.
  * @param evalContext The OpenFeature evaluation context to translate.
@@ -60,11 +66,7 @@ export default function translateContext(logger: LDLogger, evalContext: Evaluati
     } else if (value instanceof Date) {
       addCustom(convertedContext, key, value.toISOString());
     } else if (Array.isArray(value)) {
-      if (value.every((val) => typeof val === 'string')) {
-        addCustom(convertedContext, key, value as string[]);
-      } else if (value.every((val) => typeof val === 'boolean')) {
-        addCustom(convertedContext, key, value as boolean[]);
-      } else if (value.every((val) => typeof val === 'number')) {
+      if (value.every((val) => isOneOfArrayTypes(val))) {
         addCustom(convertedContext, key, value as string[]);
       } else {
         logger.warn(`The attribute '${key}' is an unsupported array type.`);

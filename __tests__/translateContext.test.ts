@@ -97,14 +97,12 @@ it('discards invalid array types', () => {
     logger,
     {
       targetingKey: 'the-key',
-      mixedTypes: [true, 'b', 1],
       dates: [new Date()],
     },
   )).toEqual({
     key: 'the-key',
   });
-  expect(logger.logs[0]).toEqual("The attribute 'mixedTypes' is an unsupported array type.");
-  expect(logger.logs[1]).toEqual("The attribute 'dates' is an unsupported array type.");
+  expect(logger.logs[0]).toEqual("The attribute 'dates' is an unsupported array type.");
 });
 
 it('converts date to ISO strings', () => {
