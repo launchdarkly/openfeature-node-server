@@ -1,4 +1,4 @@
-import { ResolutionDetails } from '@openfeature/js-sdk';
+import { ErrorCode, ResolutionDetails } from '@openfeature/js-sdk';
 import { LDEvaluationDetail } from 'launchdarkly-node-server-sdk';
 
 /**
@@ -6,20 +6,21 @@ import { LDEvaluationDetail } from 'launchdarkly-node-server-sdk';
  * @param {string} errorKind The error kind to translate.
  * @returns {string} The OpenFeature error code.
  */
-function translateErrorKind(errorKind) {
+function translateErrorKind(errorKind): ErrorCode {
   // Error code specification.
   // https://github.com/open-feature/spec/blob/main/specification/sections/02-providers.md#requirement-28
   switch (errorKind) {
     case 'CLIENT_NOT_READY':
-      return 'PROVIDER_NOT_READY';
+      return ErrorCode.PROVIDER_NOT_READY;
     case 'MALFORMED_FLAG':
-      return 'PARSE_ERROR';
+      return ErrorCode.PARSE_ERROR;
     case 'FLAG_NOT_FOUND':
-      return 'FLAG_NOT_FOUND';
+      return ErrorCode.FLAG_NOT_FOUND;
+    case 'USER_NOT_SPECIFIED':
+      return ErrorCode.TARGETING_KEY_MISSING;
     // General errors.
-    // 'USER_NOT_SPECIFIED' also falls through to default.
     default:
-      return 'GENERAL';
+      return ErrorCode.GENERAL;
   }
 }
 

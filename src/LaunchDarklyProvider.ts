@@ -1,7 +1,8 @@
 import {
+  ErrorCode,
   EvaluationContext, FlagValue, Hook,
   JsonValue,
-  Provider, ProviderMetadata, ResolutionDetails,
+  Provider, ProviderMetadata, ResolutionDetails, StandardResolutionReasons,
 } from '@openfeature/js-sdk';
 import {
   basicLogger, LDClient, LDLogger,
@@ -19,8 +20,8 @@ import translateResult from './translateResult';
 function wrongTypeResult<T>(value: T): ResolutionDetails<T> {
   return {
     value,
-    reason: 'ERROR',
-    errorCode: 'TYPE_MISMATCH',
+    reason: StandardResolutionReasons.ERROR,
+    errorCode: ErrorCode.TYPE_MISMATCH,
   };
 }
 

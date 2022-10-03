@@ -1,4 +1,4 @@
-import { OpenFeature, Client } from '@openfeature/js-sdk';
+import { OpenFeature, Client, ErrorCode } from '@openfeature/js-sdk';
 import { LDClient } from 'launchdarkly-node-server-sdk';
 import { LaunchDarklyProvider } from '../src';
 import translateContext from '../src/translateContext';
@@ -210,12 +210,12 @@ describe('given a mock LaunchDarkly client', () => {
   });
 
   it.each([
-    ['CLIENT_NOT_READY', 'PROVIDER_NOT_READY'],
-    ['MALFORMED_FLAG', 'PARSE_ERROR'],
-    ['FLAG_NOT_FOUND', 'FLAG_NOT_FOUND'],
-    ['USER_NOT_SPECIFIED', 'GENERAL'],
-    ['UNSPECIFIED', 'GENERAL'],
-    [undefined, 'GENERAL'],
+    ['CLIENT_NOT_READY', ErrorCode.PROVIDER_NOT_READY],
+    ['MALFORMED_FLAG', ErrorCode.PARSE_ERROR],
+    ['FLAG_NOT_FOUND', ErrorCode.FLAG_NOT_FOUND],
+    ['USER_NOT_SPECIFIED', ErrorCode.TARGETING_KEY_MISSING],
+    ['UNSPECIFIED', ErrorCode.GENERAL],
+    [undefined, ErrorCode.GENERAL],
   ])('handles errors from the client', async (ldError, ofError) => {
     ldClient.variationDetail = jest.fn(async () => ({
       value: { yes: 'no' },
