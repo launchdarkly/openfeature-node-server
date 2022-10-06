@@ -10,6 +10,8 @@ publications:
 jobs:
   - docker:
       image: node:18-bullseye
+    env:
+      LD_RELEASE_TYPEDOC_VERSION: 0.23.15
     template:
       name: npm
 
