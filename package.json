@@ -10,7 +10,8 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "npm run lint -- --fix",
     "test": "jest",
-    "coverage": "npm run test -- --coverage"
+    "coverage": "npm run test -- --coverage",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "launchdarkly",
