@@ -87,9 +87,9 @@ function translateContextCommon(
 }
 
 /**
- * Convert an OpenFeature evaluation context into an LDUser.
+ * Convert an OpenFeature evaluation context into an LDContext.
  * @param evalContext The OpenFeature evaluation context to translate.
- * @returns An LDUser based on the evaluation context.
+ * @returns An LDContext based on the evaluation context.
  *
  * @internal
  */
