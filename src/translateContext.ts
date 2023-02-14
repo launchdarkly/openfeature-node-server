@@ -1,47 +1,57 @@
-import { EvaluationContext } from '@openfeature/js-sdk';
-import { LDLogger, LDUser } from 'launchdarkly-node-server-sdk';
+import { EvaluationContext, EvaluationContextValue } from '@openfeature/js-sdk';
+import {
+  LDContext, LDContextCommon, LDLogger, LDSingleKindContext, LDUser,
+} from 'launchdarkly-node-server-sdk';
 
-const LDUserBuiltIns = {
-  secondary: 'string',
+const LDContextBuiltIns = {
   name: 'string',
-  firstName: 'string',
-  lastName: 'string',
-  email: 'string',
-  avatar: 'string',
-  ip: 'string',
-  country: 'string',
   anonymous: 'boolean',
 };
 
-function addCustom(context: LDUser, key: string, value: string
-| boolean
-| number
-| Array<string | boolean | number>) {
-  if (!context.custom) {
-    context.custom = {};
+/**
+ * Convert attributes, potentially recursively, into appropriate types.
+ * @param logger Logger to use if issues are encountered.
+ * @param key The key for the attribute.
+ * @param value The value of the attribute.
+ * @param object Object to place the value in.
+ */
+function convertAttributes(logger: LDLogger, key: string, value: any, object: any): any {
+  // This method is recursively populating objects, so we are intentionally
+  // re-assigning to a parameter to prevent generating many intermediate objects.
+  if (value instanceof Date) {
+    // eslint-disable-next-line no-param-reassign
+    object[key] = value.toISOString();
+  } else if (typeof value === 'object' && !Array.isArray(value)) {
+    // eslint-disable-next-line no-param-reassign
+    object[key] = {};
+    Object.entries(value).forEach(([objectKey, objectValue]) => {
+      convertAttributes(logger, objectKey, objectValue, object[key]);
+    });
+  } else {
+    // eslint-disable-next-line no-param-reassign
+    object[key] = value;
   }
-  context.custom[key] = value;
-}
-
-function isOneOfArrayTypes(val: any): boolean {
-  const typeString = typeof val;
-
-  return typeString === 'string' || typeString === 'boolean' || typeString === 'number';
 }
 
 /**
- * Convert an OpenFeature evaluation context into an LDUser.
- * @param evalContext The OpenFeature evaluation context to translate.
- * @returns An LDUser based on the evaluation context.
- *
- * @internal
+ * Translate the common part of a context. This could either be the attributes
+ * of a single context, or it could be the attributes of a nested context
+ * in a multi-context.
+ * @param logger Logger to use if issues are encountered.
+ * @param inCommon The source context information. Could be an EvaluationContext, or a value
+ * within an Evaluation context.
+ * @param inTargetingKey The targetingKey, either it or the key may be used.
+ * @returns A populated common context.
  */
-export default function translateContext(logger: LDLogger, evalContext: EvaluationContext): LDUser {
-  const keyAttr = evalContext.key as string;
-  const { targetingKey } = evalContext;
-  const finalKey = targetingKey ?? keyAttr;
+function translateContextCommon(
+  logger: LDLogger,
+  inCommon: Record<string, EvaluationContextValue>,
+  inTargetingKey: string | undefined,
+): LDContextCommon {
+  const keyAttr = inCommon.key as string;
+  const finalKey = inTargetingKey ?? keyAttr;
 
-  if (keyAttr != null && targetingKey != null) {
+  if (keyAttr != null && inTargetingKey != null) {
     logger.warn("The EvaluationContext contained both a 'targetingKey' and a 'key' attribute. The"
       + " 'key' attribute will be discarded.");
   }
@@ -51,33 +61,74 @@ export default function translateContext(logger: LDLogger, evalContext: Evaluati
       + 'type must be a string.');
   }
 
-  const convertedContext: LDUser = { key: finalKey };
-  Object.entries(evalContext).forEach(([key, value]) => {
-    if (key === 'targetingKey') {
+  const convertedContext: LDContextCommon = { key: finalKey };
+  Object.entries(inCommon).forEach(([key, value]) => {
+    if (key === 'targetingKey' || key === 'key') {
       return;
     }
-    if (key in LDUserBuiltIns) {
-      if (typeof value === LDUserBuiltIns[key]) {
+    if (key === 'privateAttributes') {
+      // eslint-disable-next-line no-underscore-dangle
+      convertedContext._meta = {
+        privateAttributes: value as string[],
+      };
+    } else if (key in LDContextBuiltIns) {
+      if (typeof value === LDContextBuiltIns[key]) {
         convertedContext[key] = value;
       } else {
         // If the type does not match, then discard.
-        logger.error(`The attribute '${key}' must be of type ${LDUserBuiltIns[key]}`);
+        logger.error(`The attribute '${key}' must be of type ${LDContextBuiltIns[key]}`);
       }
-    } else if (value instanceof Date) {
-      addCustom(convertedContext, key, value.toISOString());
-    } else if (Array.isArray(value)) {
-      if (value.every((val) => isOneOfArrayTypes(val))) {
-        addCustom(convertedContext, key, value as string[]);
-      } else {
-        logger.warn(`The attribute '${key}' is an unsupported array type.`);
-      }
-    } else if (typeof value === 'object') {
-      logger.warn(`The attribute '${key}' is of an unsupported type 'object'`);
-      // Discard.
     } else {
-      addCustom(convertedContext, key, value);
+      convertAttributes(logger, key, value, convertedContext);
     }
   });
+
+  return convertedContext;
+}
+
+/**
+ * Convert an OpenFeature evaluation context into an LDUser.
+ * @param evalContext The OpenFeature evaluation context to translate.
+ * @returns An LDUser based on the evaluation context.
+ *
+ * @internal
+ */
+export default function translateContext(
+  logger: LDLogger,
+  evalContext: EvaluationContext,
+): LDContext {
+  let finalKind = 'user';
+
+  // A multi-context.
+  if (evalContext.kind === 'multi') {
+    // TODO: Build a multi-context
+    return Object.entries(evalContext)
+      .reduce((acc: any, [key, value]: [string, EvaluationContextValue]) => {
+        if (key === 'kind') {
+          acc.kind = value;
+        } else if (typeof value === 'object' && !Array.isArray(value)) {
+          const valueRecord = value as Record<string, EvaluationContextValue>;
+          acc[key] = translateContextCommon(
+            logger,
+            valueRecord,
+            valueRecord.targetingKey as string,
+          );
+        } else {
+          logger.error('Top level attributes in a multi-kind context should be Structure types.');
+        }
+        return acc;
+      }, {});
+  } if (evalContext.kind !== undefined && typeof evalContext.kind === 'string') {
+    // Single context with specified kind.
+    finalKind = evalContext.kind;
+  } else if (evalContext.kind !== undefined && typeof evalContext.kind !== 'string') {
+    logger.warn("Specified 'kind' of context was not a string.");
+  }
+
+  const convertedContext: LDContext = {
+    kind: finalKind,
+    ...translateContextCommon(logger, evalContext, evalContext.targetingKey),
+  } as LDSingleKindContext;
 
   return convertedContext;
 }

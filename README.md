@@ -44,15 +44,91 @@ Refer to the [SDK reference guide](https://docs.launchdarkly.com/sdk/server-side
 
 ## OpenFeature Specific Considerations
 
-When evaluating an `LDUser` with the LaunchDarkly Node SDK a string `key` attribute would normally be required. When using OpenFeature the `targetingKey` attribute should be used instead of `key`. If a `key` attribute is provided in the `EvaluationContext`, then it will be discarded in favor of `targetingKey`. If a `targetingKey` is not provided, or if the `EvaluationContext` is omitted entirely, then the `defaultValue` will be returned from OpenFeature evaluation methods.
+LaunchDarkly evaluates contexts, and it can either evaluate a single-context, or a multi-context. When using OpenFeature both single and multi-contexts must be encoded into a single `EvaluationContext`. This is accomplished by looking for an attribute named `kind` in the `EvaluationContext`.
 
-Other fields normally included in an `LDUser` may be added to the `EvaluationContext`. Any `custom` attributes can
-be added to the top level of the evaluation context, and they will operate as if they were `custom` attributes on an `LDUser`. Attributes which are typically top level on an `LDUser` should be of the same types that are specified for
-an `LDUser` or they will not operate as intended.
+There are 4 different scenarios related to the `kind`:
+1. There is no `kind` attribute. In this case the provider will treat the context as a single context containing a "user" kind.
+2. There is a `kind` attribute, and the value of that attribute is "multi". This will indicate to the provider that the context is a multi-context.
+3. There is a `kind` attribute, and the value of that attribute is a string other than "multi". This will indicate to the provider a single context of the kind specified.
+4. There is a `kind` attribute, and the attribute is not a string. In this case the value of the attribute will be discarded, and the context will be treated as a "user". An error message will be logged.
 
-If a top level `custom` attribute is defined on the `EvaluationContext`, then that will be a `custom` attribute inside `custom` for an `LDUser`.
+The `kind` attribute should be a string containing only contain ASCII letters, numbers, `.`, `_` or `-`.
 
-If a custom attribute is provided, whose value is an object, then that attribute will be discarded.
+The OpenFeature specification allows for an optional targeting key, but LaunchDarkly requires a key for evaluation. A targeting key must be specified for each context being evaluated. It may be specified using either `targetingKey`, as it is in the OpenFeature specification, or `key`, which is the typical LaunchDarkly identifier for the targeting key. If a `targetingKey` and a `key` are specified, then the `targetingKey` will take precedence.
+
+There are several other attributes which have special functionality within a single or multi-context. 
+- A key of `privateAttributes`. Must be an array of string values. [Equivalent to '_meta.privateAttributes' in the SDK.](https://launchdarkly.github.io/node-server-sdk/interfaces/_launchdarkly_node_server_sdk_.LDContextMeta.html#privateAttributes)
+- A key of `anonymous`. Must be a boolean value.  [Equivalent to 'anonymous' in the SDK.](https://launchdarkly.github.io/node-server-sdk/interfaces/_launchdarkly_node_server_sdk_.LDSingleKindContext.html#anonymous)
+- A key of `name`. Must be a string. [Equivalent to 'name' in the SDK.](https://launchdarkly.github.io/node-server-sdk/interfaces/_launchdarkly_node_server_sdk_.LDSingleKindContext.html#name)
+
+### Examples
+
+#### A single user context
+
+```typescript
+const evaluationContext = {
+    targetingKey: 'my-user-key'
+};
+```
+
+#### A single context of kind "organization"
+
+```typescript
+const evaluationContext = {
+    kind: 'organization',
+    targetingKey: 'my-org-key'
+};
+```
+
+#### A multi-context containing a "user" and an "organization"
+
+```typescript
+
+const evaluationContext = {
+    kind: 'multi',
+    organization: {
+        targetingKey: 'my-org-key',
+        myCustomAttribute: 'myAttributeValue'
+    },
+    user: {
+        targetingKey: 'my-user-key'
+    }
+};
+```
+
+#### Setting private attributes in a single context
+
+```typescript
+const evaluationContext = {
+    kind: 'organization',
+    name: 'the-org-name',
+    targetingKey: 'my-org-key',
+    myCustomAttribute: 'myCustomValue',
+    privateAttributes: ['myCustomAttribute']
+};
+```
+
+#### Setting private attributes in a multi-context
+
+```typescript
+const evaluationContext = {
+    kind: 'multi',
+    organization: {
+        targetingKey: 'my-org-key',
+        name: 'the-org-name',
+        // This will ONLY apply to the "organization" attributes.
+        privateAttributes: ['myCustomAttribute'],
+        // This attribute will be private.
+        myCustomAttribute: 'myAttributeValue'
+    },
+    user: {
+        targetingKey: 'my-user-key',
+        anonymous: true,
+        // This attribute will not be private.
+        myCustomAttribute: 'myAttributeValue'
+    }
+};
+```
 
 ## Learn more
 
