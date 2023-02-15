@@ -15,7 +15,21 @@ const LDContextBuiltIns = {
  * @param value The value of the attribute.
  * @param object Object to place the value in.
  */
-function convertAttributes(logger: LDLogger, key: string, value: any, object: any): any {
+function convertAttributes(
+  logger: LDLogger,
+  key: string,
+  value: any,
+  object: any,
+  visited: any[],
+): any {
+  if (visited.includes(value)) {
+    // Prevent cycles by not visiting the same object
+    // with in the same branch. Parallel branches
+    // may contain the same object.
+    logger.error('Detected a cycle within the evaluation context. The '
+    + 'affected part of the context will not be included in evaluation.');
+    return;
+  }
   // This method is recursively populating objects, so we are intentionally
   // re-assigning to a parameter to prevent generating many intermediate objects.
   if (value instanceof Date) {
@@ -25,7 +39,7 @@ function convertAttributes(logger: LDLogger, key: string, value: any, object: an
     // eslint-disable-next-line no-param-reassign
     object[key] = {};
     Object.entries(value).forEach(([objectKey, objectValue]) => {
-      convertAttributes(logger, objectKey, objectValue, object[key]);
+      convertAttributes(logger, objectKey, objectValue, object[key], [...visited, value]);
     });
   } else {
     // eslint-disable-next-line no-param-reassign
@@ -79,7 +93,7 @@ function translateContextCommon(
         logger.error(`The attribute '${key}' must be of type ${LDContextBuiltIns[key]}`);
       }
     } else {
-      convertAttributes(logger, key, value, convertedContext);
+      convertAttributes(logger, key, value, convertedContext, [inCommon]);
     }
   });
 

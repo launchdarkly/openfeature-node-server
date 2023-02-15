@@ -181,3 +181,48 @@ it('can handle privateAttributes in a single context', () => {
   expect(translateContext(logger, evaluationContext)).toEqual(expectedContext);
   expect(logger.logs.length).toEqual(0);
 });
+
+it('detects a cycle and logs an error', () => {
+  const a = {
+    b: { c: {} },
+  };
+
+  a.b.c = a;
+  const evaluationContext = {
+    key: 'a-key',
+    kind: 'singularity',
+    a,
+  };
+
+  const expectedContext = {
+    key: 'a-key',
+    kind: 'singularity',
+    a: { b: {} },
+  };
+
+  const logger = new TestLogger();
+  expect(translateContext(logger, evaluationContext)).toEqual(expectedContext);
+  expect(logger.logs.length).toEqual(1);
+});
+
+it('allows references in different branches', () => {
+  const a = { test: 'test' };
+
+  const evaluationContext = {
+    key: 'a-key',
+    kind: 'singularity',
+    b: { a },
+    c: { a },
+  };
+
+  const expectedContext = {
+    key: 'a-key',
+    kind: 'singularity',
+    b: { a: { test: 'test' } },
+    c: { a: { test: 'test' } },
+  };
+
+  const logger = new TestLogger();
+  expect(translateContext(logger, evaluationContext)).toEqual(expectedContext);
+  expect(logger.logs.length).toEqual(0);
+});
