@@ -24,7 +24,7 @@ function convertAttributes(
 ): any {
   if (visited.includes(value)) {
     // Prevent cycles by not visiting the same object
-    // with in the same branch. Parallel branches
+    // with in the same branch. Different branches
     // may contain the same object.
     logger.error('Detected a cycle within the evaluation context. The '
     + 'affected part of the context will not be included in evaluation.');
