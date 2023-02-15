@@ -101,7 +101,6 @@ export default function translateContext(
 
   // A multi-context.
   if (evalContext.kind === 'multi') {
-    // TODO: Build a multi-context
     return Object.entries(evalContext)
       .reduce((acc: any, [key, value]: [string, EvaluationContextValue]) => {
         if (key === 'kind') {
