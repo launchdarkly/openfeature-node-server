@@ -4,3 +4,12 @@ coverage/
 reports/
 docs/
 src/
+.github/
+.circleci/
+.ldrelease/
+__tests__/
+reports/
+jest.config.js
+tsconfig.eslint.json
+.eslintrc.js
+tsconfig.json
