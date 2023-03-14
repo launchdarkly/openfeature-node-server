@@ -113,6 +113,10 @@ export default function translateContext(
 ): LDContext {
   let finalKind = 'user';
 
+  // context is absent then use default anonymous context
+  if (Object.entries(evalContext).length === 0) {
+    return { key: 'OpenFeature default', anonymous: true } as LDContext;
+  }
   // A multi-context.
   if (evalContext.kind === 'multi') {
     return Object.entries(evalContext)
