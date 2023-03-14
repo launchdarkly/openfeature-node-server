@@ -11,7 +11,8 @@
     "lint:fix": "npm run lint -- --fix",
     "test": "jest",
     "coverage": "npm run test -- --coverage",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "prepare": "husky install"
   },
   "keywords": [
     "launchdarkly",
@@ -32,6 +33,7 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
+    "husky": "^8.0.3",
     "jest": "^27.5.1",
     "jest-junit": "^14.0.1",
     "launchdarkly-node-server-sdk": "7.x",
