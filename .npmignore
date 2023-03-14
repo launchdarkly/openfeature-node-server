@@ -10,3 +10,6 @@ src/
 __tests__/
 reports/
 jest.config.js
+tsconfig.eslint.json
+.eslintrc.js
+tsconfig.json
