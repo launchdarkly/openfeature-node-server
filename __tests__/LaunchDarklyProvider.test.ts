@@ -37,6 +37,21 @@ describe('given a mock LaunchDarkly client', () => {
       .toHaveBeenCalledWith(testFlagKey, translateContext(logger, basicContext), false);
   });
 
+  it('handles correct return types for boolean variations with default context', async () => {
+    ldClient.variationDetail = jest.fn(async () => ({
+      value: true,
+      reason: {
+        kind: 'OFF',
+      },
+    }));
+    const res = await ofClient.getBooleanDetails(testFlagKey, false);
+    expect(res).toEqual({
+      flagKey: testFlagKey,
+      value: true,
+      reason: 'OFF',
+    });
+  });
+
   it('handles correct return types for boolean variations', async () => {
     ldClient.variationDetail = jest.fn(async () => ({
       value: true,
@@ -250,13 +265,13 @@ describe('given a mock LaunchDarkly client', () => {
     });
   });
 
-  it('logs information about missing keys', async () => {
-    await ofClient.getObjectDetails(testFlagKey, {}, {});
+  it('error out if context does not include etiher targetingKey or key', async () => {
+    await ofClient.getObjectDetails(testFlagKey, {}, { nonKey: 'not_a_key' });
     expect(logger.logs[0]).toEqual("The EvaluationContext must contain either a 'targetingKey' "
     + "or a 'key' and the type must be a string.");
   });
 
-  it('logs information about double keys', async () => {
+  it('logs warn information about double keys', async () => {
     await ofClient.getObjectDetails(testFlagKey, {}, { targetingKey: '1', key: '2' });
     expect(logger.logs[0]).toEqual("The EvaluationContext contained both a 'targetingKey' and a"
     + " 'key' attribute. The 'key' attribute will be discarded.");
