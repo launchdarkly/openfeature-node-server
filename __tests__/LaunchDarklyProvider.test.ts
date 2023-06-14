@@ -1,5 +1,5 @@
 import { OpenFeature, Client, ErrorCode } from '@openfeature/js-sdk';
-import { LDClient } from 'launchdarkly-node-server-sdk';
+import { LDClient } from '@launchdarkly/node-server-sdk';
 import { LaunchDarklyProvider } from '../src';
 import translateContext from '../src/translateContext';
 import TestLogger from './TestLogger';

@@ -1,7 +1,7 @@
 import { EvaluationContext, EvaluationContextValue } from '@openfeature/js-sdk';
 import {
   LDContext, LDContextCommon, LDLogger, LDSingleKindContext,
-} from 'launchdarkly-node-server-sdk';
+} from '@launchdarkly/node-server-sdk';
 
 const LDContextBuiltIns = {
   name: 'string',

@@ -6,7 +6,7 @@ import {
 } from '@openfeature/js-sdk';
 import {
   basicLogger, LDClient, LDLogger,
-} from 'launchdarkly-node-server-sdk';
+} from '@launchdarkly/node-server-sdk';
 import { LaunchDarklyProviderOptions } from './LaunchDarklyProviderOptions';
 import translateContext from './translateContext';
 import translateResult from './translateResult';

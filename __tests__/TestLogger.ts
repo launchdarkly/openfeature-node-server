@@ -1,4 +1,4 @@
-import { LDLogger } from 'launchdarkly-node-server-sdk';
+import { LDLogger } from '@launchdarkly/node-server-sdk';
 
 export default class TestLogger implements LDLogger {
   public logs: string[] = [];
