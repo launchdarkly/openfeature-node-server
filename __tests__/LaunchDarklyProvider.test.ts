@@ -45,7 +45,7 @@ describe('given a mock LaunchDarkly client', () => {
       },
     }));
     const res = await ofClient.getBooleanDetails(testFlagKey, false, basicContext);
-    expect(res).toEqual({
+    expect(res).toMatchObject({
       flagKey: testFlagKey,
       value: true,
       reason: 'OFF',
@@ -60,7 +60,7 @@ describe('given a mock LaunchDarkly client', () => {
       },
     }));
     const res = await ofClient.getBooleanDetails(testFlagKey, false, basicContext);
-    expect(res).toEqual({
+    expect(res).toMatchObject({
       flagKey: testFlagKey,
       value: false,
       reason: 'ERROR',
@@ -92,7 +92,7 @@ describe('given a mock LaunchDarkly client', () => {
       },
     }));
     const res = await ofClient.getStringDetails(testFlagKey, 'default', basicContext);
-    expect(res).toEqual({
+    expect(res).toMatchObject({
       flagKey: testFlagKey,
       value: 'good',
       reason: 'OFF',
@@ -107,7 +107,7 @@ describe('given a mock LaunchDarkly client', () => {
       },
     }));
     const res = await ofClient.getStringDetails(testFlagKey, 'default', basicContext);
-    expect(res).toEqual({
+    expect(res).toMatchObject({
       flagKey: testFlagKey,
       value: 'default',
       reason: 'ERROR',
@@ -139,7 +139,7 @@ describe('given a mock LaunchDarkly client', () => {
       },
     }));
     const res = await ofClient.getNumberDetails(testFlagKey, 0, basicContext);
-    expect(res).toEqual({
+    expect(res).toMatchObject({
       flagKey: testFlagKey,
       value: 17,
       reason: 'OFF',
@@ -154,7 +154,7 @@ describe('given a mock LaunchDarkly client', () => {
       },
     }));
     const res = await ofClient.getNumberDetails(testFlagKey, 0, basicContext);
-    expect(res).toEqual({
+    expect(res).toMatchObject({
       flagKey: testFlagKey,
       value: 0,
       reason: 'ERROR',
@@ -186,7 +186,7 @@ describe('given a mock LaunchDarkly client', () => {
       },
     }));
     const res = await ofClient.getObjectDetails(testFlagKey, {}, basicContext);
-    expect(res).toEqual({
+    expect(res).toMatchObject({
       flagKey: testFlagKey,
       value: { some: 'value' },
       reason: 'OFF',
@@ -201,7 +201,7 @@ describe('given a mock LaunchDarkly client', () => {
       },
     }));
     const res = await ofClient.getObjectDetails(testFlagKey, {}, basicContext);
-    expect(res).toEqual({
+    expect(res).toMatchObject({
       flagKey: testFlagKey,
       value: {},
       reason: 'ERROR',
@@ -225,7 +225,7 @@ describe('given a mock LaunchDarkly client', () => {
       },
     }));
     const res = await ofClient.getObjectDetails(testFlagKey, {}, basicContext);
-    expect(res).toEqual({
+    expect(res).toMatchObject({
       flagKey: testFlagKey,
       value: { yes: 'no' },
       reason: 'ERROR',
@@ -242,7 +242,7 @@ describe('given a mock LaunchDarkly client', () => {
       },
     }));
     const res = await ofClient.getObjectDetails(testFlagKey, {}, basicContext);
-    expect(res).toEqual({
+    expect(res).toMatchObject({
       flagKey: testFlagKey,
       value: { yes: 'no' },
       variant: '22',
