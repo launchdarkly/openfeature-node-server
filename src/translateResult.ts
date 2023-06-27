@@ -1,5 +1,5 @@
 import { ErrorCode, ResolutionDetails } from '@openfeature/js-sdk';
-import { LDEvaluationDetail } from 'launchdarkly-node-server-sdk';
+import { LDEvaluationDetail } from '@launchdarkly/node-server-sdk';
 
 /**
  * Convert an `errorKind` into an OpenFeature `errorCode`.
