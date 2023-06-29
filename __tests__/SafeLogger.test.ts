@@ -1,4 +1,4 @@
-import { basicLogger, LDLogger } from 'launchdarkly-node-server-sdk';
+import { basicLogger, LDLogger } from '@launchdarkly/node-server-sdk';
 import SafeLogger from '../src/SafeLogger';
 
 it('throws when constructed with an invalid logger', () => {

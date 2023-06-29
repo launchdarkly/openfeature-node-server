@@ -1,4 +1,4 @@
-import { LDLogger } from 'launchdarkly-node-server-sdk';
+import { LDLogger } from '@launchdarkly/node-server-sdk';
 
 /**
  * Logging levels. Each should correspond to a method on the logger.
