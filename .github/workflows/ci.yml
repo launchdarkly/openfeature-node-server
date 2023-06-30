@@ -1,0 +1,46 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [main, rlamb/github-action-ci]
+    paths-ignore:
+      - '**.md' #Do not need to run CI for markdown changes.
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  build-test:
+    strategy:
+      matrix:
+        # Node versions to run on.
+        node: [14, latest]
+        # Platforms to run on.
+        os: [ubuntu-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install
+        run: npm install
+      - name: Build
+        run: npm run build
+      - name: Test
+        run: npm test
+        env:
+          JEST_JUNIT_OUTPUT_FILE: "reports/junit/js-test-results.xml"
+      - name: Lint
+        run: npm run lint
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Jest Tests
+          path: "reports/junit/js-test-results.xml"
+          reporter: jest-junit
