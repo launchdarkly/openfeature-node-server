@@ -14,18 +14,19 @@ jobs:
   build-test:
     strategy:
       matrix:
-        # Node versions to run on.
-        node: [14, latest]
-        # Platforms to run on.
-        os: [ubuntu-latest, windows-latest]
+        variations: [
+          {os: ubuntu-latest, node: latest},
+          {os: ubuntu-latest, node: 14},
+          {os: windows-latest, node: latest}
+        ]
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.variations.os }}
 
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node }}
+          node-version: ${{ matrix.variations.node }}
           registry-url: 'https://registry.npmjs.org'
       - name: Install
         run: npm install
@@ -41,6 +42,6 @@ jobs:
         uses: dorny/test-reporter@v1
         if: always()
         with:
-          name: Jest Tests
+          name: Jest Tests ${{ matrix.variations.os }}-${{ matrix.variations.node }}
           path: "reports/junit/js-test-results.xml"
           reporter: jest-junit
