@@ -2,6 +2,12 @@
 
 All notable changes to the LaunchDarkly OpenFeature provider for the Server-Side SDK for Node.js will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org).
 
+## [0.4.0] - 2023-07-26
+This version contains a breaking change. If you upgrade to this version, then you will also need to update to the `@launchdarkly/node-server-sdk` package.
+
+### Changed:
+- Updated to use the `@launchdarkly/node-server-sdk`.
+
 ## [0.3.0] - 2023-03-14
 ### Fixed:
 - Include typescript type declarations in release package.
