@@ -38,10 +38,3 @@ jobs:
           JEST_JUNIT_OUTPUT_FILE: "reports/junit/js-test-results.xml"
       - name: Lint
         run: yarn run lint
-      - name: Test Report
-        uses: dorny/test-reporter@v1
-        if: always()
-        with:
-          name: Jest Tests ${{ matrix.variations.os }}-${{ matrix.variations.node }}
-          path: "reports/junit/js-test-results.xml"
-          reporter: jest-junit
