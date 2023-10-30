@@ -1,4 +1,4 @@
-import { ErrorCode, ResolutionDetails } from '@openfeature/js-sdk';
+import { ErrorCode, ResolutionDetails } from '@openfeature/server-sdk';
 import { LDEvaluationDetail } from '@launchdarkly/node-server-sdk';
 
 /**

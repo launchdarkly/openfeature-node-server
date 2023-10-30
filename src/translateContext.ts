@@ -1,4 +1,4 @@
-import { EvaluationContext, EvaluationContextValue } from '@openfeature/js-sdk';
+import { EvaluationContext, EvaluationContextValue } from '@openfeature/server-sdk';
 import {
   LDContext, LDContextCommon, LDLogger, LDSingleKindContext,
 } from '@launchdarkly/node-server-sdk';

@@ -1,5 +1,9 @@
-import { OpenFeature, Client, ErrorCode } from '@openfeature/js-sdk';
-import { LDClient } from '@launchdarkly/node-server-sdk';
+import {
+  OpenFeature, Client, ErrorCode, ProviderStatus, ProviderEvents,
+} from '@openfeature/server-sdk';
+import {
+  LDClient, LDClientContext, integrations,
+} from '@launchdarkly/node-server-sdk';
 import { LaunchDarklyProvider } from '../src';
 import translateContext from '../src/translateContext';
 import TestLogger from './TestLogger';
@@ -7,18 +11,73 @@ import TestLogger from './TestLogger';
 const basicContext = { targetingKey: 'the-key' };
 const testFlagKey = 'a-key';
 
+it('can be initialized', async () => {
+  const ldProvider = new LaunchDarklyProvider('sdk-key', { offline: true });
+  await ldProvider.initialize({});
+
+  expect(ldProvider.status).toEqual(ProviderStatus.READY);
+  await ldProvider.onClose();
+});
+
+it('can fail to initialize client', async () => {
+  const ldProvider = new LaunchDarklyProvider('sdk-key', {
+    updateProcessor: (
+      clientContext: LDClientContext,
+      dataSourceUpdates: any,
+      initSuccessHandler: VoidFunction,
+      errorHandler?: (e: Error) => void,
+    ) => ({
+      start: () => {
+        setTimeout(() => errorHandler?.({ code: 401 } as any), 20);
+      },
+    }),
+    sendEvents: false,
+  });
+  try {
+    await ldProvider.initialize({});
+  } catch (e) {
+    expect((e as Error).message).toEqual('Authentication failed. Double check your SDK key.');
+  }
+  expect(ldProvider.status).toEqual(ProviderStatus.ERROR);
+});
+
+it('emits events for flag changes', async () => {
+  const td = new integrations.TestData();
+  const ldProvider = new LaunchDarklyProvider('sdk-key', {
+    updateProcessor: td.getFactory(),
+    sendEvents: false,
+  });
+  let count = 0;
+  ldProvider.events.addHandler(ProviderEvents.ConfigurationChanged, (eventDetail) => {
+    expect(eventDetail?.flagsChanged).toEqual(['flagA']);
+    count += 1;
+  });
+  td.update(td.flag('flagA').valueForAll('B'));
+  expect(await ldProvider.getClient()
+    .stringVariation('flagA', { key: 'test-key' }, 'A'))
+    .toEqual('B');
+  expect(count).toEqual(1);
+  await ldProvider.onClose();
+});
+
 describe('given a mock LaunchDarkly client', () => {
   let ldClient: LDClient;
   let ofClient: Client;
+  let ldProvider: LaunchDarklyProvider;
   const logger: TestLogger = new TestLogger();
 
   beforeEach(() => {
-    ldClient = {
-      variationDetail: jest.fn(),
-    } as any;
-    OpenFeature.setProvider(new LaunchDarklyProvider(ldClient, { logger }));
+    ldProvider = new LaunchDarklyProvider('sdk-key', { logger, offline: true });
+    ldClient = ldProvider.getClient();
+    OpenFeature.setProvider(ldProvider);
+
     ofClient = OpenFeature.getClient();
     logger.reset();
+  });
+
+  afterEach(async () => {
+    await ldProvider.onClose();
+    jest.restoreAllMocks();
   });
 
   it('calls the client correctly for boolean variations', async () => {

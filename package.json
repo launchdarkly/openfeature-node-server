@@ -20,11 +20,11 @@
   ],
   "license": "Apache-2.0",
   "peerDependencies": {
-    "@openfeature/js-sdk": "^1.0.0",
-    "@launchdarkly/node-server-sdk": "8.x"
+    "@openfeature/server-sdk": "^1.6.3",
+    "@launchdarkly/node-server-sdk": "9.x"
   },
   "devDependencies": {
-    "@openfeature/js-sdk": "^1.0.0",
+    "@openfeature/server-sdk": "^1.6.3",
     "@types/jest": "^27.4.1",
     "@typescript-eslint/eslint-plugin": "^5.22.0",
     "@typescript-eslint/parser": "^5.22.0",
@@ -34,7 +34,7 @@
     "eslint-plugin-import": "^2.26.0",
     "jest": "^27.5.1",
     "jest-junit": "^14.0.1",
-    "@launchdarkly/node-server-sdk": "8.x",
+    "@launchdarkly/node-server-sdk": "9.x",
     "ts-jest": "^27.1.4",
     "typescript": "^4.7.4"
   }
