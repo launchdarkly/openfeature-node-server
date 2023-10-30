@@ -2,14 +2,20 @@ import {
   ErrorCode,
   EvaluationContext, FlagValue, Hook,
   JsonValue,
-  Provider, ProviderMetadata, ResolutionDetails, StandardResolutionReasons,
-} from '@openfeature/js-sdk';
+  OpenFeatureEventEmitter,
+  Provider,
+  ProviderEvents,
+  ProviderMetadata,
+  ProviderStatus,
+  ResolutionDetails,
+  StandardResolutionReasons,
+} from '@openfeature/server-sdk';
 import {
-  basicLogger, LDClient, LDLogger,
+  basicLogger, init, LDClient, LDLogger, LDOptions,
 } from '@launchdarkly/node-server-sdk';
-import { LaunchDarklyProviderOptions } from './LaunchDarklyProviderOptions';
 import translateContext from './translateContext';
 import translateResult from './translateResult';
+import SafeLogger from './SafeLogger';
 
 /**
  * Create a ResolutionDetails for an evaluation that produced a type different
@@ -31,19 +37,66 @@ function wrongTypeResult<T>(value: T): ResolutionDetails<T> {
 export default class LaunchDarklyProvider implements Provider {
   private readonly logger: LDLogger;
 
+  private readonly client: LDClient;
+
+  private readonly clientConstructionError: any;
+
   readonly metadata: ProviderMetadata = {
     name: 'launchdarkly-node-provider',
   };
+
+  private innerStatus: ProviderStatus = ProviderStatus.NOT_READY;
+
+  public readonly events = new OpenFeatureEventEmitter();
+
+  /**
+   * Get the status of the LaunchDarkly provider.
+   */
+  public get status() {
+    return this.innerStatus;
+  }
 
   /**
    * Construct a {@link LaunchDarklyProvider}.
    * @param client The LaunchDarkly client instance to use.
    */
-  constructor(private readonly client: LDClient, options: LaunchDarklyProviderOptions = {}) {
+  constructor(sdkKey: string, options: LDOptions = {}) {
     if (options.logger) {
-      this.logger = options.logger;
+      this.logger = new SafeLogger(options.logger, basicLogger({ level: 'info' }));
     } else {
       this.logger = basicLogger({ level: 'info' });
+    }
+    try {
+      this.client = init(sdkKey, {
+        ...options,
+        wrapperName: 'open-feature/node-server',
+        // The wrapper version should be kept on its own line to allow easy updates using
+        // release-please.
+        wrapperVersion: '0.4.0', // x-release-please-version
+      });
+      this.client.on('update', ({ key }: { key: string }) => this.events.emit(ProviderEvents.ConfigurationChanged, { flagsChanged: [key] }));
+    } catch (e) {
+      this.clientConstructionError = e;
+      this.logger.error(`Encountered unrecoverable initialization error, ${e}`);
+      this.innerStatus = ProviderStatus.ERROR;
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async initialize(context?: EvaluationContext): Promise<void> {
+    if (!this.client) {
+      // The client could not be constructed.
+      if (this.clientConstructionError) {
+        throw this.clientConstructionError;
+      }
+      throw new Error('Unknown problem encountered during initialization');
+    }
+    try {
+      await this.client.waitForInitialization();
+      this.innerStatus = ProviderStatus.READY;
+    } catch (e) {
+      this.innerStatus = ProviderStatus.ERROR;
+      throw e;
     }
   }
 
@@ -168,5 +221,23 @@ export default class LaunchDarklyProvider implements Provider {
 
   private translateContext(context: EvaluationContext) {
     return translateContext(this.logger, context);
+  }
+
+  /**
+   * Get the LDClient instance used by this provider.
+   *
+   * @returns The client for this provider.
+   */
+  public getClient(): LDClient {
+    return this.client;
+  }
+
+  /**
+   * Called by OpenFeature when it needs to close the provider. This will flush
+   * events from the LDClient and then close it.
+   */
+  async onClose(): Promise<void> {
+    await this.client.flush();
+    this.client.close();
   }
 }

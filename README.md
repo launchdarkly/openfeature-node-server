@@ -14,30 +14,46 @@ This provider is a beta version and should not be considered ready for productio
 
 ## Supported Node versions
 
-This version of the LaunchDarkly OpenFeature provider is compatible with Node.js versions 14 and above.
+This version of the LaunchDarkly OpenFeature provider is compatible with Node.js versions 16 and above.
 
 ## Getting started
 
 ### Installation
 
 ```
-npm install @openfeature/js-sdk
+npm install @openfeature/server-sdk
 npm install @launchdarkly/node-server-sdk
 npm install @launchdarkly/openfeature-node-server
 ```
 
 ### Usage
 ```
-import { OpenFeature } from '@openfeature/js-sdk';
+import { OpenFeature } from '@openfeature/server-sdk';
 import { init } from '@launchdarkly/node-server-sdk';
 import { LaunchDarklyProvider } from '@launchdarkly/openfeature-node-server';
 
+const ldProvider = new LaunchDarklyProvider('<your-sdk-key>', {/* LDOptions here */});
+OpenFeature.setProvider(ldProvider);
 
-const ldClient = init('<your-sdk-key>');
-await ldClient.waitForInitialization();
-OpenFeature.setProvider(new LaunchDarklyProvider(ldClient));
-const client = OpenFeature.getClient();
-const value = await client.getBooleanValue('app-enabled', false, {targetingKey: 'my-key'});
+// If you need access to the LDClient, then you can use ldProvider.getClient()
+
+// Evaluations before the provider indicates it is ready may get default values with a 
+// CLIENT_NOT_READY reason.
+OpenFeature.addHandler(ProviderEvents.Ready, (eventDetails) => {
+    const client = OpenFeature.getClient();
+    const value = await client.getBooleanValue('app-enabled', false, {targetingKey: 'my-key'});
+});
+
+// The LaunchDarkly provider supports the ProviderEvents.ConfigurationChanged event.
+// The provider will emit this event for any flag key that may have changed (each event will contain
+// a single key in the `flagsChanged` field).
+OpenFeature.addHandler(ProviderEvents.Ready, (eventDetails) => {
+    console.log(`Changed ${eventDetails.flagsChanged}`);
+});
+
+// When the LaunchDarkly provider is closed it will flush the events on the LDClient instance.
+// This can be useful for short lived processes.
+await OpenFeature.close();
 ```
 
 Refer to the [SDK reference guide](https://docs.launchdarkly.com/sdk/server-side/node-js) for instructions on getting started with using the SDK.
