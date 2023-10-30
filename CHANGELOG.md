@@ -2,6 +2,14 @@
 
 All notable changes to the LaunchDarkly OpenFeature provider for the Server-Side SDK for Node.js will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org).
 
+## [0.5.0] - 2023-10-30
+This version contains a breaking change. If you upgrade to this version, then you will also need to update the `@launchdarkly/node-server-sdk`, and `@openfeature/server-sdk` packages. Additionally code changes will be required because of the new method of constructing the provider. Refer to the README for an updated code sample.
+
+### Changed:
+- Changed the way that the `LaunchDarklyProvider` is instantiated. Now the `LDClient` is managed by the `LaunchDarklyProvider`. If you need to access the `LDClient` directly you can use the `getClient()` method of the provider.
+- Updated to use the `@launchdarkly/node-server-sdk` version `9.0.1` or higher.
+- Update to use `@openfeature/server-sdk` version `1.6.3`. The open feature SDK was renamed from `@openfeature/js-sdk`.
+
 ## [0.4.0] - 2023-07-26
 This version contains a breaking change. If you upgrade to this version, then you will also need to update to the `@launchdarkly/node-server-sdk` package.
 
