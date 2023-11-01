@@ -2,6 +2,10 @@
 
 All notable changes to the LaunchDarkly OpenFeature provider for the Server-Side SDK for Node.js will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org).
 
+## [0.5.1] - 2023-11-01
+### Changed:
+- Changed the reported wrapper name. This has no impact on functionality.
+
 ## [0.5.0] - 2023-10-30
 This version contains a breaking change. If you upgrade to this version, then you will also need to update the `@launchdarkly/node-server-sdk`, and `@openfeature/server-sdk` packages. Additionally code changes will be required because of the new method of constructing the provider. Refer to the README for an updated code sample.
 
