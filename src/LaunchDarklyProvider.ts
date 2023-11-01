@@ -69,10 +69,10 @@ export default class LaunchDarklyProvider implements Provider {
     try {
       this.client = init(sdkKey, {
         ...options,
-        wrapperName: 'open-feature/node-server',
+        wrapperName: 'open-feature-node-server',
         // The wrapper version should be kept on its own line to allow easy updates using
         // release-please.
-        wrapperVersion: '0.4.0', // x-release-please-version
+        wrapperVersion: '0.6.0', // x-release-please-version
       });
       this.client.on('update', ({ key }: { key: string }) => this.events.emit(ProviderEvents.ConfigurationChanged, { flagsChanged: [key] }));
     } catch (e) {
