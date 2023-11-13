@@ -29,7 +29,6 @@ npm install @launchdarkly/openfeature-node-server
 ### Usage
 ```
 import { OpenFeature } from '@openfeature/server-sdk';
-import { init } from '@launchdarkly/node-server-sdk';
 import { LaunchDarklyProvider } from '@launchdarkly/openfeature-node-server';
 
 const ldProvider = new LaunchDarklyProvider('<your-sdk-key>', {/* LDOptions here */});
