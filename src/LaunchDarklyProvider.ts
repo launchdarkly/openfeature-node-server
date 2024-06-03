@@ -1,6 +1,6 @@
 import {
   ErrorCode,
-  EvaluationContext, FlagValue, Hook,
+  EvaluationContext, Hook,
   JsonValue,
   OpenFeatureEventEmitter,
   Provider,
@@ -215,7 +215,7 @@ export default class LaunchDarklyProvider implements Provider {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  get hooks(): Hook<FlagValue>[] {
+  get hooks(): Hook[] {
     return [];
   }
 
