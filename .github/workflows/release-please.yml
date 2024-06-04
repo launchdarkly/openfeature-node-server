@@ -52,7 +52,7 @@ jobs:
         run: npm run doc
 
       - id: publish-docs
-        name: Publish Documentatio
+        name: Publish Documentation
         uses: ./.github/actions/publish-docs
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
