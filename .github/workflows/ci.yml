@@ -16,7 +16,7 @@ jobs:
       matrix:
         variations: [
           {os: ubuntu-latest, node: latest},
-          {os: ubuntu-latest, node: 16},
+          {os: ubuntu-latest, node: 18},
           {os: windows-latest, node: latest}
         ]
 
