@@ -22,11 +22,11 @@
   "license": "Apache-2.0",
   "peerDependencies": {
     "@launchdarkly/node-server-sdk": "9.x",
-    "@openfeature/server-sdk": "^1.13.5"
+    "@openfeature/server-sdk": "^1.14.0"
   },
   "devDependencies": {
     "@launchdarkly/node-server-sdk": "9.x",
-    "@openfeature/server-sdk": "^1.13.5",
+    "@openfeature/server-sdk": "^1.14.0",
     "@types/jest": "^27.4.1",
     "@typescript-eslint/eslint-plugin": "^5.22.0",
     "@typescript-eslint/parser": "^5.22.0",
