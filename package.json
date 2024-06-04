@@ -4,6 +4,11 @@
   "description": "LaunchDarkly OpenFeature provider for node.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "homepage": "https://github.com/launchdarkly/openfeature-node-server",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/launchdarkly/openfeature-node-server.git"
+  },
   "scripts": {
     "clean": "tsc --build --clean",
     "build": "tsc --build",
