@@ -16,7 +16,7 @@ jobs:
       matrix:
         variations: [
           {os: ubuntu-latest, node: latest},
-          {os: ubuntu-latest, node: 16},
+          {os: ubuntu-latest, node: 18},
           {os: windows-latest, node: latest}
         ]
 
@@ -29,12 +29,12 @@ jobs:
           node-version: ${{ matrix.variations.node }}
           registry-url: 'https://registry.npmjs.org'
       - name: Install
-        run: yarn
+        run: npm install
       - name: Build
-        run: yarn run build
+        run: npm run build
       - name: Test
-        run: yarn test
+        run: npm test
         env:
           JEST_JUNIT_OUTPUT_FILE: "reports/junit/js-test-results.xml"
       - name: Lint
-        run: yarn run lint
+        run: npm run lint

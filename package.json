@@ -11,7 +11,8 @@
     "lint:fix": "npm run lint -- --fix",
     "test": "jest",
     "coverage": "npm run test -- --coverage",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "doc": "typedoc"
   },
   "keywords": [
     "launchdarkly",
@@ -20,11 +21,12 @@
   ],
   "license": "Apache-2.0",
   "peerDependencies": {
-    "@openfeature/server-sdk": "^1.6.3",
-    "@launchdarkly/node-server-sdk": "9.x"
+    "@launchdarkly/node-server-sdk": "9.x",
+    "@openfeature/server-sdk": "^1.14.0"
   },
   "devDependencies": {
-    "@openfeature/server-sdk": "^1.6.3",
+    "@launchdarkly/node-server-sdk": "9.x",
+    "@openfeature/server-sdk": "^1.14.0",
     "@types/jest": "^27.4.1",
     "@typescript-eslint/eslint-plugin": "^5.22.0",
     "@typescript-eslint/parser": "^5.22.0",
@@ -34,8 +36,8 @@
     "eslint-plugin-import": "^2.26.0",
     "jest": "^27.5.1",
     "jest-junit": "^14.0.1",
-    "@launchdarkly/node-server-sdk": "9.x",
     "ts-jest": "^27.1.4",
+    "typedoc": "^0.25.13",
     "typescript": "^4.7.4"
   }
 }

@@ -15,7 +15,11 @@ it('can be initialized', async () => {
   const ldProvider = new LaunchDarklyProvider('sdk-key', { offline: true });
   await ldProvider.initialize({});
 
-  expect(ldProvider.status).toEqual(ProviderStatus.READY);
+  await OpenFeature.setProviderAndWait(ldProvider);
+
+  const ofClient = OpenFeature.getClient();
+
+  expect(ofClient.providerStatus).toEqual(ProviderStatus.READY);
   await ldProvider.onClose();
 });
 
@@ -30,15 +34,17 @@ it('can fail to initialize client', async () => {
       start: () => {
         setTimeout(() => errorHandler?.({ code: 401 } as any), 20);
       },
+      close: () => {},
     }),
     sendEvents: false,
   });
   try {
-    await ldProvider.initialize({});
+    await OpenFeature.setProviderAndWait(ldProvider);
   } catch (e) {
     expect((e as Error).message).toEqual('Authentication failed. Double check your SDK key.');
   }
-  expect(ldProvider.status).toEqual(ProviderStatus.ERROR);
+  const ofClient = OpenFeature.getClient();
+  expect(ofClient.providerStatus).toEqual(ProviderStatus.ERROR);
 });
 
 it('emits events for flag changes', async () => {
@@ -66,10 +72,10 @@ describe('given a mock LaunchDarkly client', () => {
   let ldProvider: LaunchDarklyProvider;
   const logger: TestLogger = new TestLogger();
 
-  beforeEach(() => {
+  beforeEach(async () => {
     ldProvider = new LaunchDarklyProvider('sdk-key', { logger, offline: true });
     ldClient = ldProvider.getClient();
-    OpenFeature.setProvider(ldProvider);
+    await OpenFeature.setProviderAndWait(ldProvider);
 
     ofClient = OpenFeature.getClient();
     logger.reset();
@@ -283,7 +289,7 @@ describe('given a mock LaunchDarkly client', () => {
         errorKind: ldError,
       },
     }));
-    const res = await ofClient.getObjectDetails(testFlagKey, {}, basicContext);
+    const res = await ofClient.getObjectDetails(testFlagKey, { yes: 'no' }, basicContext);
     expect(res).toMatchObject({
       flagKey: testFlagKey,
       value: { yes: 'no' },

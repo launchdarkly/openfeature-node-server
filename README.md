@@ -14,7 +14,7 @@ This provider is a beta version and should not be considered ready for productio
 
 ## Supported Node versions
 
-This version of the LaunchDarkly OpenFeature provider is compatible with Node.js versions 16 and above.
+This version of the LaunchDarkly OpenFeature provider is compatible with Node.js versions 18 and above.
 
 ## Getting started
 
@@ -31,12 +31,20 @@ npm install @launchdarkly/openfeature-node-server
 import { OpenFeature } from '@openfeature/server-sdk';
 import { LaunchDarklyProvider } from '@launchdarkly/openfeature-node-server';
 
+// The LaunchDarkly provider will use a 10 second timeout by default when waiting for the SDK
+// to initialize. This can be controlled by the optional third parameter to the LaunchDarklyProvider
+// constructor.
 const ldProvider = new LaunchDarklyProvider('<your-sdk-key>', {/* LDOptions here */});
+
 OpenFeature.setProvider(ldProvider);
+
+// Alternatively await OpenFeature.setProviderAndWait(ldProvider); can be used.
+// This eliminated the need to listen for the ready event, but the user should be careful to handle
+// any exceptions that are thrown.
 
 // If you need access to the LDClient, then you can use ldProvider.getClient()
 
-// Evaluations before the provider indicates it is ready may get default values with a 
+// Evaluations before the provider indicates it is ready may get default values with a
 // CLIENT_NOT_READY reason.
 OpenFeature.addHandler(ProviderEvents.Ready, (eventDetails) => {
     const client = OpenFeature.getClient();
@@ -71,7 +79,7 @@ The `kind` attribute should be a string containing only contain ASCII letters, n
 
 The OpenFeature specification allows for an optional targeting key, but LaunchDarkly requires a key for evaluation. A targeting key must be specified for each context being evaluated. It may be specified using either `targetingKey`, as it is in the OpenFeature specification, or `key`, which is the typical LaunchDarkly identifier for the targeting key. If a `targetingKey` and a `key` are specified, then the `targetingKey` will take precedence.
 
-There are several other attributes which have special functionality within a single or multi-context. 
+There are several other attributes which have special functionality within a single or multi-context.
 - A key of `privateAttributes`. Must be an array of string values. [Equivalent to '_meta.privateAttributes' in the SDK.](https://launchdarkly.github.io/node-server-sdk/interfaces/_launchdarkly_node_server_sdk_.LDContextMeta.html#privateAttributes)
 - A key of `anonymous`. Must be a boolean value.  [Equivalent to 'anonymous' in the SDK.](https://launchdarkly.github.io/node-server-sdk/interfaces/_launchdarkly_node_server_sdk_.LDSingleKindContext.html#anonymous)
 - A key of `name`. Must be a string. [Equivalent to 'name' in the SDK.](https://launchdarkly.github.io/node-server-sdk/interfaces/_launchdarkly_node_server_sdk_.LDSingleKindContext.html#name)

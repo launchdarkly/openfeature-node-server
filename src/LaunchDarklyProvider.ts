@@ -1,12 +1,12 @@
 import {
   ErrorCode,
-  EvaluationContext, FlagValue, Hook,
+  EvaluationContext, Hook,
   JsonValue,
   OpenFeatureEventEmitter,
+  Paradigm,
   Provider,
   ProviderEvents,
   ProviderMetadata,
-  ProviderStatus,
   ResolutionDetails,
   StandardResolutionReasons,
 } from '@openfeature/server-sdk';
@@ -45,22 +45,18 @@ export default class LaunchDarklyProvider implements Provider {
     name: 'launchdarkly-node-provider',
   };
 
-  private innerStatus: ProviderStatus = ProviderStatus.NOT_READY;
+  readonly runsOn?: Paradigm = 'server';
 
   public readonly events = new OpenFeatureEventEmitter();
 
   /**
-   * Get the status of the LaunchDarkly provider.
-   */
-  public get status() {
-    return this.innerStatus;
-  }
-
-  /**
    * Construct a {@link LaunchDarklyProvider}.
-   * @param client The LaunchDarkly client instance to use.
+   * @param sdkKey The SDK key.
+   * @param options Any options for the SDK.
+   * @param initTimeoutSeconds The default amount of time to wait for initialization in seconds.
+   * Defaults to 10 seconds.
    */
-  constructor(sdkKey: string, options: LDOptions = {}) {
+  constructor(sdkKey: string, options: LDOptions = {}, private initTimeoutSeconds: number = 10) {
     if (options.logger) {
       this.logger = new SafeLogger(options.logger, basicLogger({ level: 'info' }));
     } else {
@@ -78,7 +74,6 @@ export default class LaunchDarklyProvider implements Provider {
     } catch (e) {
       this.clientConstructionError = e;
       this.logger.error(`Encountered unrecoverable initialization error, ${e}`);
-      this.innerStatus = ProviderStatus.ERROR;
     }
   }
 
@@ -91,13 +86,7 @@ export default class LaunchDarklyProvider implements Provider {
       }
       throw new Error('Unknown problem encountered during initialization');
     }
-    try {
-      await this.client.waitForInitialization();
-      this.innerStatus = ProviderStatus.READY;
-    } catch (e) {
-      this.innerStatus = ProviderStatus.ERROR;
-      throw e;
-    }
+    await this.client.waitForInitialization({ timeout: this.initTimeoutSeconds });
   }
 
   /**
@@ -215,7 +204,7 @@ export default class LaunchDarklyProvider implements Provider {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  get hooks(): Hook<FlagValue>[] {
+  get hooks(): Hook[] {
     return [];
   }
 
