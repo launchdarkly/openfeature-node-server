@@ -40,8 +40,6 @@ jobs:
       - name: Install Dependencies
         run: npm install
         # Publishing will build because we have a prepublish script.
-      - name: Build Documentation
-        run: npm run doc
 
       - id: publish-npm
         name: Publish NPM Package
