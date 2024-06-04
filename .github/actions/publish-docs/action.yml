@@ -1,5 +1,5 @@
 name: Publish Documentation
-description: 'Publish documentation to and github pages.'
+description: 'Publish documentation to github pages.'
 
 inputs:
   github_token:
