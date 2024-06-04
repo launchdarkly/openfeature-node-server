@@ -31,8 +31,16 @@ npm install @launchdarkly/openfeature-node-server
 import { OpenFeature } from '@openfeature/server-sdk';
 import { LaunchDarklyProvider } from '@launchdarkly/openfeature-node-server';
 
+// The LaunchDarkly provider will use a 10 second timeout by default when waiting for the SDK
+// to initialize. This can be controlled by the optional third parameter to the LaunchDarklyProvider
+// constructor.
 const ldProvider = new LaunchDarklyProvider('<your-sdk-key>', {/* LDOptions here */});
+
 OpenFeature.setProvider(ldProvider);
+
+// Alternatively await OpenFeature.setProviderAndWait(ldProvider); can be used.
+// This eliminated the need to listen for the ready event, but the user should be careful to handle
+// any exceptions that are thrown.
 
 // If you need access to the LDClient, then you can use ldProvider.getClient()
 
