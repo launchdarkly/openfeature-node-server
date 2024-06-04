@@ -2,6 +2,13 @@
 
 All notable changes to the LaunchDarkly OpenFeature provider for the Server-Side SDK for Node.js will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org).
 
+## [0.6.3](https://github.com/launchdarkly/openfeature-node-server/compare/openfeature-node-server-v0.6.2...openfeature-node-server-v0.6.3) (2024-06-04)
+
+
+### Bug Fixes
+
+* Revert to CommonJS until esbuild is added. ([#45](https://github.com/launchdarkly/openfeature-node-server/issues/45)) ([294b627](https://github.com/launchdarkly/openfeature-node-server/commit/294b627208d2a134900f3429e0892d5847752b83))
+
 ## [0.6.2](https://github.com/launchdarkly/openfeature-node-server/compare/openfeature-node-server-v0.6.1...openfeature-node-server-v0.6.2) (2024-06-04)
 
 
