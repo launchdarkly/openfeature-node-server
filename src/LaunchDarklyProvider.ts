@@ -9,12 +9,14 @@ import {
   ProviderMetadata,
   ResolutionDetails,
   StandardResolutionReasons,
+  TrackingEventDetails,
 } from '@openfeature/server-sdk';
 import {
   basicLogger, init, LDClient, LDLogger, LDOptions,
 } from '@launchdarkly/node-server-sdk';
 import translateContext from './translateContext';
 import translateResult from './translateResult';
+import translateTrackingEventDetails from './translateTrackingEventDetails';
 import SafeLogger from './SafeLogger';
 
 /**
@@ -228,5 +230,25 @@ export default class LaunchDarklyProvider implements Provider {
   async onClose(): Promise<void> {
     await this.client.flush();
     this.client.close();
+  }
+
+  /**
+   * Track a user action or application state, usually representing a business objective or outcome.
+   * @param trackingEventName The name of the event, which may correspond to a metric
+   *   in Experimentation.
+   * @param context The context to track.
+   * @param trackingEventDetails Optional additional information to associate with the event.
+   */
+  track(
+    trackingEventName: string,
+    context: EvaluationContext,
+    trackingEventDetails: TrackingEventDetails,
+  ): void {
+    this.client.track(
+      trackingEventName,
+      this.translateContext(context),
+      translateTrackingEventDetails(trackingEventDetails),
+      trackingEventDetails?.value,
+    );
   }
 }

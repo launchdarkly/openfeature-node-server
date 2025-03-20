@@ -326,4 +326,54 @@ describe('given a mock LaunchDarkly client', () => {
     expect(logger.logs[0]).toEqual("The EvaluationContext contained both a 'targetingKey' and a"
     + " 'key' attribute. The 'key' attribute will be discarded.");
   });
+
+  it('handles tracking with invalid context', () => {
+    ofClient.track('test-event', {});
+    expect(logger.logs[0]).toEqual("The EvaluationContext must contain either a 'targetingKey' "
+      + "or a 'key' and the type must be a string.");
+  });
+
+  it('handles tracking with no data or metricValue', () => {
+    ldClient.track = jest.fn();
+    ofClient.track('test-event', basicContext);
+    expect(ldClient.track).toHaveBeenCalledWith(
+      'test-event',
+      translateContext(logger, basicContext),
+      undefined,
+      undefined,
+    );
+  });
+
+  it('handles tracking with only metricValue', () => {
+    ldClient.track = jest.fn();
+    ofClient.track('test-event', basicContext, { value: 12345 });
+    expect(ldClient.track).toHaveBeenCalledWith(
+      'test-event',
+      translateContext(logger, basicContext),
+      undefined,
+      12345,
+    );
+  });
+
+  it('handles tracking with data but no metricValue', () => {
+    ldClient.track = jest.fn();
+    ofClient.track('test-event', basicContext, { key1: 'val1' });
+    expect(ldClient.track).toHaveBeenCalledWith(
+      'test-event',
+      translateContext(logger, basicContext),
+      { key1: 'val1' },
+      undefined,
+    );
+  });
+
+  it('handles tracking with data and metricValue', () => {
+    ldClient.track = jest.fn();
+    ofClient.track('test-event', basicContext, { value: 12345, key1: 'val1' });
+    expect(ldClient.track).toHaveBeenCalledWith(
+      'test-event',
+      translateContext(logger, basicContext),
+      { key1: 'val1' },
+      12345,
+    );
+  });
 });
