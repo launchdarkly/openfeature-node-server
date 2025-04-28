@@ -52,7 +52,7 @@ OpenFeature.addHandler(ProviderEvents.Ready, (eventDetails) => {
 // The LaunchDarkly provider supports the ProviderEvents.ConfigurationChanged event.
 // The provider will emit this event for any flag key that may have changed (each event will contain
 // a single key in the `flagsChanged` field).
-OpenFeature.addHandler(ProviderEvents.Ready, (eventDetails) => {
+OpenFeature.addHandler(ProviderEvents.ConfigurationChanged, (eventDetails) => {
     console.log(`Changed ${eventDetails.flagsChanged}`);
 });
 
