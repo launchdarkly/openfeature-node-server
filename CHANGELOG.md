@@ -2,6 +2,13 @@
 
 All notable changes to the LaunchDarkly OpenFeature provider for the Server-Side SDK for Node.js will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org).
 
+## [1.2.0](https://github.com/launchdarkly/openfeature-node-server/compare/openfeature-node-server-v1.1.0...openfeature-node-server-v1.2.0) (2026-03-06)
+
+
+### Features
+
+* Bump minimum node version to 20 because 18 is out of support. ([5cc2de7](https://github.com/launchdarkly/openfeature-node-server/commit/5cc2de75a2c3bfb02db35de98a59862b3cf57581))
+
 ## [1.1.0](https://github.com/launchdarkly/openfeature-node-server/compare/openfeature-node-server-v1.0.0...openfeature-node-server-v1.1.0) (2025-03-21)
 
 
