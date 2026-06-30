@@ -1,3 +1,8 @@
+# This repository has moved to [js-core](https://github.com/launchdarkly/js-core/tree/main/packages/sdk/openfeature-node-server).
+
+The `@launchdarkly/openfeature-node-server` source has moved to the
+[js-core repository](https://github.com/launchdarkly/js-core/tree/main/packages/sdk/openfeature-node-server). All future releases will be made from that repository. Please file issues and feature requests in the [js-core issue tracker](https://github.com/launchdarkly/js-core/issues?q=is%3Aissue+is%3Aopen+label%3A%22package%3A+sdk%2Fopenfeature-node-server%22+sort%3Aupdated-desc).
+
 # LaunchDarkly OpenFeature provider for the Server-Side SDK for Node.js
 
 This provider allows for using LaunchDarkly with the OpenFeature JS SDK.
